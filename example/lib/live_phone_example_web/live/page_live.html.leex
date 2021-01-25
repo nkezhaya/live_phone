@@ -1,0 +1,12 @@
+<section class="phx-hero">
+  <h1>LivePhone Demo</h1>
+
+  <%= form_tag "#", phx_change: "change", phx_submit: "change" %>
+    <%= live_component(@socket, LivePhone.Component, id: "phone", form: :user, field: :phone, preferred: ["US", "GB", "CA"]) %>
+  </form>
+</section>
+
+<%= if assigns[:phone_number] != nil and assigns[:phone_number] != "" do %>
+  <pre>Typing: <%= assigns[:phone_number] %></pre>
+  <pre>Valid number?: <%= if assigns[:valid?], do: "Yes", else: "No" %></pre>
+<% end %>

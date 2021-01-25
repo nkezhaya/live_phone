@@ -1,0 +1,9 @@
+<div class="live_phone <%= if @is_valid?, do: " live_phone-valid" %>" id="live_phone-<%= @id %>" phx-hook="LivePhone">
+  <%= country_selector(assigns) %>
+
+  <%= phone_input(assigns) %>
+
+  <%= hidden_phone_input(assigns) %>
+
+  <%= country_list(assigns) %>
+</div>

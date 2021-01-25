@@ -1,0 +1,19 @@
+{
+  "name": "live_phone",
+  "version": "0.1.0",
+  "description": "A LiveView Component for phone number input fields",
+  "author": "whitepaperclip",
+  "license": "MIT",
+  "main": "./priv/static/live_phone.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/whitepaperclip/live_phone.git"
+  },
+  "dependencies": {},
+  "files": [
+    "README.md",
+    "package.json",
+    "assets/live_phone.js",
+    "assets/live_phone.css"
+  ]
+}
