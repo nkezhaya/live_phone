@@ -91,8 +91,12 @@ input.live_phone-input {
   background: #EEEEEE;
 }
 
-.live_phone-country-item.preferred:last-of-type {
-  border-bottom: 1px solid #000;
+.live_phone-country-separator {
+  margin: 0;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #ddd;
 }
 
 .live_phone-country-item-name {

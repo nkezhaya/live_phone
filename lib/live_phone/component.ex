@@ -155,8 +155,17 @@ defmodule LivePhone.Component do
       class: "live_phone-country-list",
       id: "live_phone-country-list-#{assigns[:id]}"
     ) do
-      for country <- Countries.list_countries(preferred_countries) do
-        country_list_item(assigns, country)
+      countries = Countries.list_countries(preferred_countries)
+      last_preferred = countries |> Enum.filter(& &1.preferred) |> List.last()
+
+      for country <- countries do
+        output = [country_list_item(assigns, country)]
+
+        if last_preferred == country do
+          output = output ++ [country_list_separator()]
+        else
+          output
+        end
       end
     end
   end
@@ -181,6 +190,15 @@ defmodule LivePhone.Component do
         content_tag(:span, country.name, class: "live_phone-country-item-name"),
         content_tag(:span, "+" <> country.region_code, class: "live_phone-country-item-code")
       ]
+    end
+  end
+
+  defp country_list_separator() do
+    content_tag(:li,
+      role: "separator",
+      aria_disabled: "true",
+      class: "live_phone-country-separator"
+    ) do
     end
   end
 end
