@@ -1,6 +1,31 @@
 defmodule LivePhone.Component do
   @moduledoc """
-  Documentation for `LivePhone`.
+  The `LivePhone.Component` is a Phoenix LiveView component that can be used
+  to prompt users for their phone numbers, and try to make it as simple as possible.
+
+  Usage is pretty simple, and there is an example Phoenix project included in the
+  `./example`/  directory of this repository, so feel free to check that out as well.
+
+  ```elixir
+    live_component(
+      @socket,
+      LivePhone.Component,
+      id: "phone",
+      form: :user,
+      field: :phone,
+      tabindex: 0,
+      preferred: ["US", "CA"]
+    )
+  ```
+
+  This will result in a form field with the name `user[phone]`. You can specify
+  just the `name` manually if desired, but when you add the `form` option the
+  name will be generated via `Phoenix.HTML.Form.input_name/2`. So this should
+  behave like a regular input field.
+
+  With `preferred` you can set a list of countries that you believe should be
+  on top always. The currently selected country will also be on top automatically.
+
   """
   use Phoenix.LiveComponent
   use Phoenix.HTML
@@ -27,7 +52,7 @@ defmodule LivePhone.Component do
   @impl true
   def update(assigns, socket) do
     preferred = assigns[:preferred] || ["US"]
-    default_country = hd(preferred)
+    default_country = assigns[:country] || hd(preferred)
 
     {:ok,
      socket
@@ -37,7 +62,7 @@ defmodule LivePhone.Component do
 
   @impl true
   def handle_event("typing", %{"value" => value}, socket) do
-    formatted_value = LivePhone.normalize(value, socket.assigns[:country])
+    formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
     is_valid? = LivePhone.is_valid?(formatted_value)
 
     {:noreply,
@@ -142,13 +167,8 @@ defmodule LivePhone.Component do
 
   defp country_list(%{is_opened?: false}), do: nil
 
-  defp country_list(assigns) do
-    preferred_countries =
-      case assigns[:country] do
-        "" -> assigns[:preferred]
-        nil -> assigns[:preferred]
-        country -> [country | assigns[:preferred]]
-      end
+  defp country_list(%{country: country} = assigns) do
+    preferred_countries = [country | assigns[:preferred]]
 
     content_tag(:ul,
       role: "listbox",

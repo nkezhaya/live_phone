@@ -1,8 +1,30 @@
 defmodule LivePhone.Countries do
-  alias ISO
+  @moduledoc """
+  The `LivePhone.Countries` module can be used to list all known countries and return
+  them ordered alphabetically, and optionally you can ensure your preferred countries
+  are prepended to the list instead of mixed in with the rest.
+  """
 
+  alias ISO
   alias LivePhone.Country
 
+  @doc """
+  This function returns all known countries as `LivePhone.Country` structs,
+  sorted alphabetically by country name.
+
+  Optionally you can specify a list of preferred country codes, these will
+  subsequently be prepended to the list.
+
+  ```elixir
+  # This will return everything alphabetically
+  abc_countries = LivePhone.Countries.list_countries()
+
+  # This will return it alphabetically as well, but push
+  # the US and GB `LivePhone.Country` structs to the top
+  # of the list.
+  my_countries = LivePhone.Countries.list_countries(["US", "GB"])
+  ```
+  """
   def list_countries(preferred \\ []) when is_list(preferred) do
     preferred = preferred |> Enum.uniq() |> Enum.with_index()
 

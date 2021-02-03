@@ -1,8 +1,37 @@
 defmodule LivePhone.Country do
+  @moduledoc """
+  The `LivePhone.Country` struct holds minimal information about a country,
+  but it should be enough data for `LivePhone` to work it's magic.
+  """
+
   alias ExPhoneNumber.Metadata
 
   defstruct [:code, :name, :flag_emoji, :region_code, preferred: false]
 
+  @doc ~S"""
+  Converts the given `iso_country` tuple into a `LivePhone.Country` struct.
+
+  ## Examples
+
+      iex> ISO.countries() |> Map.to_list() |> List.first() |> LivePhone.Country.from_iso()
+      %LivePhone.Country{
+        preferred: false,
+        region_code: "232",
+        flag_emoji: "🇸🇱",
+        code: "SL",
+        name: "Sierra Leone"
+      }
+
+      iex> LivePhone.Country.from_iso({"US", %{"name" => "United States"}})
+      %LivePhone.Country{
+        preferred: false,
+        region_code: "1",
+        flag_emoji: "🇺🇸",
+        code: "US",
+        name: "United States"
+      }
+
+  """
   def from_iso({country_code, %{"name" => name}}) do
     %__MODULE__{
       region_code: find_region_code(country_code),
