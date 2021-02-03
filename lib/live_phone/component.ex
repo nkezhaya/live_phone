@@ -162,7 +162,7 @@ defmodule LivePhone.Component do
         output = [country_list_item(assigns, country)]
 
         if last_preferred == country do
-          output = output ++ [country_list_separator()]
+          output ++ [country_list_separator()]
         else
           output
         end
