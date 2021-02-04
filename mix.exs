@@ -31,7 +31,8 @@ defmodule LivePhone.MixProject do
       {:ex_phone_number, "~> 0.2.1"},
       {:jason, "~> 1.0"},
       {:iso, "~> 1.0"},
-      {:floki, ">= 0.27.0", only: :test}
+      {:floki, ">= 0.27.0", only: :test},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 end

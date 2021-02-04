@@ -37,6 +37,7 @@ defmodule LivePhone.Component do
   alias ISO
 
   @impl true
+  @spec mount(Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(socket) do
     {:ok,
      socket
@@ -50,6 +51,8 @@ defmodule LivePhone.Component do
   end
 
   @impl true
+  @spec update(Phoenix.LiveView.Socket.assigns(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, Phoenix.LiveView.Socket.t()}
   def update(assigns, socket) do
     preferred = assigns[:preferred] || ["US"]
     default_country = assigns[:country] || hd(preferred)
@@ -61,6 +64,8 @@ defmodule LivePhone.Component do
   end
 
   @impl true
+  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) ::
+          {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("typing", %{"value" => value}, socket) do
     formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
     is_valid? = LivePhone.is_valid?(formatted_value)
@@ -96,6 +101,7 @@ defmodule LivePhone.Component do
      |> assign(:is_opened?, false)}
   end
 
+  @spec get_placeholder(String.t()) :: String.t()
   defp get_placeholder(country) do
     country
     |> ExPhoneNumber.Metadata.get_for_region_code()
@@ -114,12 +120,14 @@ defmodule LivePhone.Component do
     end
   end
 
+  @spec assign_country(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
   defp assign_country(socket, country) do
     socket
     |> assign(:country, country)
     |> assign(:placeholder, get_placeholder(country))
   end
 
+  @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
   defp phone_input(assigns) do
     tag(:input,
       type: "text",
@@ -133,6 +141,7 @@ defmodule LivePhone.Component do
     )
   end
 
+  @spec hidden_phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
   defp hidden_phone_input(assigns) do
     hidden_input(
       assigns[:form],
@@ -142,6 +151,7 @@ defmodule LivePhone.Component do
     )
   end
 
+  @spec country_selector(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
   defp country_selector(assigns) do
     content_tag(:div,
       role: "combobox",
@@ -165,8 +175,10 @@ defmodule LivePhone.Component do
     end
   end
 
+  @spec country_list(%{is_opened?: boolean()}) :: nil
   defp country_list(%{is_opened?: false}), do: nil
 
+  @spec country_list(%{country: String.t()}) :: Phoenix.HTML.Safe.t()
   defp country_list(%{country: country} = assigns) do
     preferred_countries = [country | assigns[:preferred]]
 
@@ -190,6 +202,7 @@ defmodule LivePhone.Component do
     end
   end
 
+  @spec country_list_item(Phoenix.LiveView.Socket.assigns(), Country.t()) :: Phoenix.HTML.Safe.t()
   defp country_list_item(assigns, %Country{} = country) do
     selected? = country.code == assigns[:country]
 
@@ -213,7 +226,8 @@ defmodule LivePhone.Component do
     end
   end
 
-  defp country_list_separator() do
+  @spec country_list_separator() :: Phoenix.HTML.Safe.t()
+  defp country_list_separator do
     content_tag(:li,
       role: "separator",
       aria_disabled: "true",

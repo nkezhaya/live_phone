@@ -1,4 +1,6 @@
 %{
+  "dialyxir": {:hex, :dialyxir, "1.0.0", "6a1fa629f7881a9f5aaf3a78f094b2a51a0357c843871b8bc98824e7342d00a5", [:mix], [{:erlex, ">= 0.2.6", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm", "aeb06588145fac14ca08d8061a142d52753dbc2cf7f0d00fc1013f53f8654654"},
+  "erlex": {:hex, :erlex, "0.2.6", "c7987d15e899c7a2f34f5420d2a2ea0d659682c06ac607572df55a43753aa12e", [:mix], [], "hexpm", "2ed2e25711feb44d52b17d2780eabf998452f6efda104877a3881c2f8c0c0c75"},
   "ex_phone_number": {:hex, :ex_phone_number, "0.2.1", "c332d5119b0ffebe3f3e4c1d5264d544b972d5d350230d7b5b1586bbfaf1036e", [:mix], [{:sweet_xml, "~> 0.6.5", [hex: :sweet_xml, repo: "hexpm", optional: false]}], "hexpm", "988acbe6ffb70ee33164ad5c185dc6767028369280dcbb4ceda4bc66373b2b10"},
   "floki": {:hex, :floki, "0.29.0", "b1710d8c93a2f860dc2d7adc390dd808dc2fb8f78ee562304457b75f4c640881", [:mix], [{:html_entities, "~> 0.5.0", [hex: :html_entities, repo: "hexpm", optional: false]}], "hexpm", "008585ce64b9f74c07d32958ec9866f4b8a124bf4da1e2941b28e41384edaaad"},
   "html_entities": {:hex, :html_entities, "0.5.1", "1c9715058b42c35a2ab65edc5b36d0ea66dd083767bef6e3edb57870ef556549", [:mix], [], "hexpm", "30efab070904eb897ff05cd52fa61c1025d7f8ef3a9ca250bc4e6513d16c32de"},

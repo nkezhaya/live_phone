@@ -32,6 +32,7 @@ defmodule LivePhone do
       true
 
   """
+  @spec is_valid?(String.t()) :: boolean()
   def is_valid?(phone) do
     with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
          true <- ExPhoneNumber.is_valid_number?(parsed_phone) do
@@ -54,6 +55,7 @@ defmodule LivePhone do
       "+16502530000"
 
   """
+  @spec normalize!(String.t(), String.t()) :: String.t()
   def normalize!(phone, country) do
     phone
     |> normalize(country)
@@ -77,6 +79,7 @@ defmodule LivePhone do
       {:ok, "+16502530000"}
 
   """
+  @spec normalize(String.t(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def normalize(phone, country) do
     phone
     |> String.replace(~r/[^\d]/, "")
@@ -105,6 +108,7 @@ defmodule LivePhone do
       "🇺🇸"
 
   """
+  @spec emoji_for_country(String.t() | nil) :: String.t()
   def emoji_for_country(nil), do: ""
 
   def emoji_for_country(country_code) do

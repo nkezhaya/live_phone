@@ -25,6 +25,7 @@ defmodule LivePhone.Countries do
   my_countries = LivePhone.Countries.list_countries(["US", "GB"])
   ```
   """
+  @spec list_countries(list(String.t())) :: [Country.t()]
   def list_countries(preferred \\ []) when is_list(preferred) do
     preferred = preferred |> Enum.uniq() |> Enum.with_index()
 
@@ -35,6 +36,7 @@ defmodule LivePhone.Countries do
     |> Enum.sort_by(&sort_by_preferred(&1, preferred), :desc)
   end
 
+  @spec set_preferred_flag(Country.t(), list(String.t())) :: Country.t()
   defp set_preferred_flag(%Country{} = country, preferred) do
     preferred
     |> Enum.find(fn {value, _index} -> value == country.code end)
@@ -44,10 +46,12 @@ defmodule LivePhone.Countries do
     end
   end
 
+  @spec sort_by_name(%{name: String.t()}, %{name: String.t()}) :: boolean()
   defp sort_by_name(%{name: name_1}, %{name: name_2}) do
     name_1 < name_2
   end
 
+  @spec sort_by_preferred(Country.t(), list(String.t())) :: integer()
   defp sort_by_preferred(%Country{preferred: false}, _), do: 0
 
   defp sort_by_preferred(%Country{code: country_code}, preferred) do
