@@ -105,11 +105,13 @@ class LivePhone {
     // key: down arrow
     // Move the selection down (selectedIndex + 1)
     if (e.keyCode == 40) {
+      e.preventDefault()
       this.shiftSelectedCountry(+1)
 
     // key: up arrow
     // Move the selection up (selectedIndex - 1)
     } else if (e.keyCode == 38) {
+      e.preventDefault()
       this.shiftSelectedCountry(-1)
 
     // key: space
@@ -117,12 +119,14 @@ class LivePhone {
     // has focus, send the click event to the focused element
     } else if (e.keyCode == 32) {
       if (this.isOpened || !this.countriesHasFocus) return
+      e.preventDefault()
       document.activeElement.click()
 
     // key: enter
     // If the country list overlay is closed and the button
     // has focus, send the click event to the focused element
     } else if (e.keyCode == 13) {
+      e.preventDefault()
       if (!this.isOpened && this.countriesHasFocus) {
         document.activeElement.click()
         return
@@ -152,6 +156,7 @@ class LivePhone {
     // key: escape
     // Escape simply closes the overlay
     } else if (e.keyCode == 27) {
+      e.preventDefault()
       this.closeOverlay()
     }
   }
