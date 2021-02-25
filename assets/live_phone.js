@@ -1,3 +1,5 @@
+const scrollIntoFn = 'scrollIntoView' in Element.prototype ? 'scrollIntoViewIfNeeded' : scrollIntoView
+
 class LivePhone {
   constructor(context) {
     // This contains the original context of the LiveView Hook
@@ -94,7 +96,7 @@ class LivePhone {
     items[newSelection].ariaSelected = "true"
     items[newSelection].classList.add('selected')
 
-    items[newSelection].scrollIntoView({
+    items[newSelection][scrollIntoFn]({
       behavior: 'auto',
       block: 'nearest',
       inline: 'nearest'
@@ -205,7 +207,7 @@ class LivePhone {
     const countryItemEl = items[firstResult].parentNode
     countryItemEl.ariaSelected = 'true'
     countryItemEl.classList.add('selected')
-    countryItemEl.scrollIntoView({
+    countryItemEl[scrollIntoFn]({
       behavior: 'auto',
       block: 'start',
       inline: 'start'
