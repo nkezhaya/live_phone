@@ -124,7 +124,6 @@ defmodule LivePhone.Component do
   defp assign_country(socket, country) do
     socket
     |> assign(:country, country)
-    |> assign(:placeholder, get_placeholder(country))
   end
 
   @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
@@ -134,7 +133,7 @@ defmodule LivePhone.Component do
       class: "live_phone-input",
       value: assigns[:value],
       tabindex: assigns[:tabindex],
-      placeholder: assigns[:placeholder],
+      placeholder: assigns[:placeholder] || get_placeholder(assigns[:country]),
       phx_target: assigns[:myself],
       phx_keyup: "typing",
       phx_blur: "close"
