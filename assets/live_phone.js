@@ -128,8 +128,8 @@ class LivePhone {
     // If the country list overlay is closed and the button
     // has focus, send the click event to the focused element
     } else if (e.keyCode == 13) {
-      e.preventDefault()
       if (!this.isOpened && this.countriesHasFocus) {
+        e.preventDefault()
         document.activeElement.click()
         return
       }
@@ -140,6 +140,7 @@ class LivePhone {
         return
       }
 
+      e.preventDefault()
       const items = Array.from(this.elements.countryListItems())
       const currentItem = items.find(item => item.ariaSelected === "true")
 
