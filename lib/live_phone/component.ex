@@ -43,24 +43,13 @@ defmodule LivePhone.Component do
      socket
      |> assign_new(:preferred, fn -> ["US", "GB"] end)
      |> assign_new(:tabindex, fn -> 0 end)
-     |> assign_country("US")
+     |> assign_new(:country, fn ->
+       socket.assigns[:country] || hd(socket.assigns[:preferred] || ["US"])
+     end)
      |> assign(:is_opened?, false)
      |> assign(:is_valid?, false)
      |> assign(:value, "")
      |> assign(:formatted_value, "")}
-  end
-
-  @impl true
-  @spec update(Phoenix.LiveView.Socket.assigns(), Phoenix.LiveView.Socket.t()) ::
-          {:ok, Phoenix.LiveView.Socket.t()}
-  def update(assigns, socket) do
-    preferred = assigns[:preferred] || ["US"]
-    default_country = assigns[:country] || hd(preferred)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign_country(default_country)}
   end
 
   @impl true
