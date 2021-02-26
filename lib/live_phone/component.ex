@@ -43,28 +43,68 @@ defmodule LivePhone.Component do
      socket
      |> assign_new(:preferred, fn -> ["US", "GB"] end)
      |> assign_new(:tabindex, fn -> 0 end)
-     |> assign_new(:country, fn ->
-       socket.assigns[:country] || hd(socket.assigns[:preferred] || ["US"])
-     end)
+     |> assign_new(:value, fn -> "" end)
      |> assign(:is_opened?, false)
-     |> assign(:is_valid?, false)
-     |> assign(:value, "")
-     |> assign(:formatted_value, "")}
+     |> assign(:is_valid?, false)}
+  end
+
+  @impl true
+  @spec update(Phoenix.LiveView.Socket.assigns(), Phoenix.LiveView.Socket.t()) ::
+          {:ok, Phoenix.LiveView.Socket.t()}
+  def update(assigns, socket) do
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(country: assigns[:country] || hd(assigns[:preferred] || ["US"]))
+     |> set_value()}
+  end
+
+  @spec set_value(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
+  def set_value(socket) do
+    set_value(socket, socket.assigns[:value])
+  end
+
+  @spec set_value(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  def set_value(socket, value) do
+    value =
+      value ||
+        case socket.assigns do
+          %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
+            input_value(form, field)
+
+          %{value: value} when not is_nil(value) ->
+            value
+
+          _ ->
+            value
+        end || ""
+
+    formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
+    is_valid? = LivePhone.is_valid?(formatted_value)
+
+    socket =
+      with true <- is_valid?,
+           {:ok, country} <- LivePhone.get_country(value) do
+        socket
+        |> assign(:country, country.code)
+        |> assign(:value, String.replace(formatted_value, "+#{country.region_code}", ""))
+      else
+        _ -> socket |> assign(:value, value)
+      end
+
+    socket
+    |> assign(:is_valid?, is_valid?)
+    |> assign(:formatted_value, formatted_value)
+    |> push_event("change", %{value: formatted_value})
   end
 
   @impl true
   @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) ::
           {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("typing", %{"value" => value}, socket) do
-    formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
-    is_valid? = LivePhone.is_valid?(formatted_value)
-
     {:noreply,
      socket
-     |> assign(:value, value)
-     |> assign(:is_valid?, is_valid?)
-     |> assign(:formatted_value, formatted_value)
-     |> push_event("change", %{value: formatted_value})}
+     |> set_value(value)}
   end
 
   def handle_event("select_country", %{"country" => country}, socket) do

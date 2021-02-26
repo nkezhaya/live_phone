@@ -36,6 +36,22 @@ defmodule LivePhone.Countries do
     |> Enum.sort_by(&sort_by_preferred(&1, preferred), :desc)
   end
 
+  @doc """
+  This function can be used to try and find the `Country` for a specific
+  phone number in the `ExPhoneNumber` format.
+  """
+  @spec lookup(ExPhoneNumber.Model.PhoneNumber.t()) :: {:ok, Country.t()} | {:error, :not_found}
+  def lookup(%ExPhoneNumber.Model.PhoneNumber{} = phone) do
+    country_code = ExPhoneNumber.Metadata.get_region_code_for_number(phone)
+
+    list_countries()
+    |> Enum.find(&(&1.code == country_code))
+    |> case do
+      nil -> {:error, :not_found}
+      country -> {:ok, country}
+    end
+  end
+
   @spec set_preferred_flag(Country.t(), list(String.t())) :: Country.t()
   defp set_preferred_flag(%Country{} = country, preferred) do
     preferred

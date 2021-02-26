@@ -4,6 +4,8 @@ defmodule LivePhone do
   #{File.read!(@external_resource)}
   """
 
+  alias LivePhone.Countries
+
   @doc ~S"""
   This is used to verify a given `phone` number and see if it is a valid
   number according to ExPhoneNumber.
@@ -39,6 +41,45 @@ defmodule LivePhone do
       true
     else
       _ -> false
+    end
+  end
+
+  @doc ~S"""
+  This is used to try and get a `Country` for a given phone number.
+
+  ## Examples
+
+      iex> LivePhone.get_country("")
+      {:error, :invalid_number}
+
+      iex> LivePhone.get_country("+1555")
+      {:error, :invalid_number}
+
+      iex> LivePhone.get_country("+1555")
+      {:error, :invalid_number}
+
+      iex> LivePhone.get_country("+1 (555) 555-1234")
+      {:error, :invalid_number}
+
+      iex> LivePhone.get_country("+1 (555) 555-1234")
+      {:error, :invalid_number}
+
+      iex> LivePhone.get_country("+1 (650) 253-0000")
+      {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
+
+      iex> LivePhone.get_country("+16502530000")
+      {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
+
+  """
+  @spec get_country(String.t()) ::
+          {:ok, Countries.Country.t()} | {:error, :invalid_number}
+  def get_country(phone) do
+    with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
+         true <- ExPhoneNumber.is_valid_number?(parsed_phone),
+         {:ok, country} <- Countries.lookup(parsed_phone) do
+      {:ok, country}
+    else
+      _ -> {:error, :invalid_number}
     end
   end
 
