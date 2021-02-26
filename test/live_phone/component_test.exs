@@ -32,6 +32,41 @@ defmodule LivePhone.ComponentTest do
     assert component =~ "name=\"user[phone]\""
   end
 
+  test "support setting placeholder" do
+    component =
+      render_component(LivePhone.Component, id: "livephone", placeholder: "Phone Number")
+
+    assert component =~ "placeholder=\"Phone Number\""
+  end
+
+  test "support setting form and field from changeset (new)" do
+    use Phoenix.HTML
+
+    changeset = LivePhoneTestApp.User.changeset()
+
+    form = form_for(changeset, "/")
+    component = render_component(LivePhone.Component, id: "livephone", form: form, field: :phone)
+
+    assert component =~ "name=\"user[phone]\""
+    assert component =~ "value=\"\""
+  end
+
+  test "support setting form and field from changeset (edit)" do
+    use Phoenix.HTML
+
+    changeset =
+      LivePhoneTestApp.User.changeset(
+        %LivePhoneTestApp.User{},
+        %{id: 1, phone: "+16502530000"}
+      )
+
+    form = form_for(changeset, "/")
+    component = render_component(LivePhone.Component, id: "livephone", form: form, field: :phone)
+
+    assert component =~ "name=\"user[phone]\""
+    assert component =~ "value=\"+16502530000\""
+  end
+
   test "support setting form, field and name (name wins)" do
     component =
       render_component(LivePhone.Component,

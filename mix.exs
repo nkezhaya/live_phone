@@ -28,8 +28,10 @@ defmodule LivePhone.MixProject do
     [
       {:phoenix_live_view, "~> 0.15.0"},
       {:phoenix_html, "~> 2.11"},
+      {:phoenix_ecto, "~> 4.0", only: :test},
       {:ex_phone_number, "~> 0.2.1"},
       {:jason, "~> 1.0"},
+      {:ecto, "~> 3.5", only: :test},
       {:iso, "~> 1.0"},
       {:floki, ">= 0.27.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false}

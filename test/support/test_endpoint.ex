@@ -33,4 +33,18 @@ defmodule LivePhoneTestApp do
     use Phoenix.Endpoint, otp_app: :live_phone
     plug(Router)
   end
+
+  defmodule User do
+    use Ecto.Schema
+    import Ecto.Changeset
+
+    schema "users" do
+      field(:phone, :string)
+    end
+
+    def changeset(struct \\ %__MODULE__{}, params \\ %{}) do
+      struct
+      |> cast(params, [:phone])
+    end
+  end
 end

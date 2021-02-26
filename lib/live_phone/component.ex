@@ -67,17 +67,22 @@ defmodule LivePhone.Component do
   @spec set_value(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
   def set_value(socket, value) do
     value =
-      value ||
-        case socket.assigns do
-          %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
-            input_value(form, field)
+      case value do
+        "" ->
+          case socket.assigns do
+            %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
+              input_value(form, field)
 
-          %{value: value} when not is_nil(value) ->
-            value
+            %{value: value} when not is_nil(value) ->
+              value
 
-          _ ->
-            value
-        end || ""
+            _ ->
+              value
+          end
+
+        value ->
+          value
+      end || ""
 
     formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
     is_valid? = LivePhone.is_valid?(formatted_value)
