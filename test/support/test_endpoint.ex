@@ -6,6 +6,17 @@ defmodule LivePhoneTestApp do
     use Phoenix.LiveView
 
     @impl true
+    def handle_params(%{"format" => "1"}, _session, socket) do
+      {:noreply,
+       socket
+       |> assign(apply_format?: true)}
+    end
+
+    def handle_params(_params, _session, socket) do
+      {:noreply, socket}
+    end
+
+    @impl true
     def render(assigns) do
       ~L"""
       <%= live_component(
@@ -14,6 +25,7 @@ defmodule LivePhoneTestApp do
         id: "phone",
         form: :user,
         field: :phone,
+        apply_format?: assigns[:apply_format?] == true,
         placeholder: "Phone",
         preferred: ["US", "GB", "CA"]
       ) %>
@@ -32,6 +44,15 @@ defmodule LivePhoneTestApp do
 
   defmodule Endpoint do
     use Phoenix.Endpoint, otp_app: :live_phone
+
+    plug(Plug.Parsers,
+      parsers: [:urlencoded, :multipart, :json],
+      pass: ["*/*"],
+      body_reader: {BasicSpaceWeb.Plugs.CacheBodyReader, :read_body, []},
+      json_decoder: Jason,
+      length: 100_000_000
+    )
+
     plug(Router)
   end
 

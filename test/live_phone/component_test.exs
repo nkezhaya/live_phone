@@ -253,7 +253,7 @@ defmodule LivePhone.ComponentTest do
   end
 
   test "reformat while typing", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
+    {:ok, view, _html} = live(conn, "/?format=1")
 
     assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "424242"})
     assert_push_event(view, "format", %{value: "424 242 "})
@@ -268,7 +268,7 @@ defmodule LivePhone.ComponentTest do
   end
 
   test "reformat while typing (ignore empty value)", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
+    {:ok, view, _html} = live(conn, "/?format=1")
 
     assert view |> element(".live_phone-input") |> render_keyup(%{"value" => ""})
     refute_push_event(view, "format", %{value: ""})
@@ -281,12 +281,19 @@ defmodule LivePhone.ComponentTest do
   end
 
   test "reformat while typing (ignore same value)", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
+    {:ok, view, _html} = live(conn, "/?format=1")
 
     assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
     assert_push_event(view, "format", %{value: "650 253 0000"})
 
     assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+16502530000"})
+    refute_push_event(view, "format", %{value: "650 253 0000"})
+  end
+
+  test "dont reformat if [apply_format?: false] ", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
     refute_push_event(view, "format", %{value: "650 253 0000"})
   end
 

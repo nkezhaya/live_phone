@@ -43,6 +43,7 @@ defmodule LivePhone.Component do
      socket
      |> assign_new(:preferred, fn -> ["US", "GB"] end)
      |> assign_new(:tabindex, fn -> 0 end)
+     |> assign_new(:apply_format?, fn -> false end)
      |> assign_new(:value, fn -> "" end)
      |> assign(:is_opened?, false)
      |> assign(:is_valid?, false)}
@@ -172,6 +173,7 @@ defmodule LivePhone.Component do
   end
 
   @spec format_user_input(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  defp format_user_input(%{assigns: %{apply_format?: false}} = socket, _), do: socket
   defp format_user_input(socket, ""), do: socket
   defp format_user_input(socket, "0"), do: socket
   defp format_user_input(socket, "00"), do: socket
