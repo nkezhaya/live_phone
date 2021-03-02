@@ -182,6 +182,44 @@ defmodule LivePhone.ComponentTest do
     assert view |> element("div.live_phone-country") |> render() =~ "🇬🇧 +44"
   end
 
+  test "change placeholder on select country", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    # Placeholder is "Phone" by default
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+
+    # Click the country button
+    assert view |> element("div.live_phone-country") |> render_click()
+
+    # Yes country list
+    assert view |> element("ul.live_phone-country-list") |> has_element?()
+
+    # Click Great Britain
+    assert view |> element("li[phx-value-country=\"GB\"]") |> render_click()
+
+    # Placeholder should change to example number
+    assert view |> element(".live_phone-input[placeholder='055 5555 5555']") |> has_element?()
+  end
+
+  test "change placeholder on select country (unless same country)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    # Placeholder is "Phone" by default
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+
+    # Click the country button
+    assert view |> element("div.live_phone-country") |> render_click()
+
+    # Yes country list
+    assert view |> element("ul.live_phone-country-list") |> has_element?()
+
+    # Click Great Britain
+    assert view |> element("li[phx-value-country=\"US\"]") |> render_click()
+
+    # Placeholder should change to example number
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+  end
+
   test "close country list on input blur", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
 
@@ -212,5 +250,58 @@ defmodule LivePhone.ComponentTest do
 
     # Expected normalized value
     assert view |> element("input[type=hidden]") |> render() =~ "value=\"+16502530000\""
+  end
+
+  test "reformat while typing", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/?format=1")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "424242"})
+    assert_push_event(view, "format", %{value: "424 242 "})
+
+    # Hidden field should keep normalized value
+    assert view |> element("input[type=hidden]") |> render() =~ "value=\"+1424242\""
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
+    assert_push_event(view, "format", %{value: "650 253 0000"})
+
+    assert view |> element("input[type=hidden]") |> render() =~ "value=\"+16502530000\""
+  end
+
+  test "reformat while typing (ignore empty value)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/?format=1")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => ""})
+    refute_push_event(view, "format", %{value: ""})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "0"})
+    refute_push_event(view, "format", %{value: "0"})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "00"})
+    refute_push_event(view, "format", %{value: "00"})
+  end
+
+  test "reformat while typing (ignore same value)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/?format=1")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
+    assert_push_event(view, "format", %{value: "650 253 0000"})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+16502530000"})
+    refute_push_event(view, "format", %{value: "650 253 0000"})
+  end
+
+  test "dont reformat if [apply_format?: false] ", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
+    refute_push_event(view, "format", %{value: "650 253 0000"})
+  end
+
+  # NOTE: This function does not exist by itself so I just copied and changed the
+  # built-in assert_push_event from LiveView for this purpose.
+  defp refute_push_event(view, event, payload, timeout \\ 100) do
+    %{proxy: {ref, _topic, _}} = view
+
+    refute_receive {^ref, {:push_event, ^event, ^payload}}, timeout
   end
 end

@@ -2,7 +2,7 @@ defmodule LivePhoneExampleWeb.PageLive do
   use LivePhoneExampleWeb, :live_view
 
   @impl true
-  def mount(socket) do
+  def mount(_params, _session, socket) do
     {:ok,
      socket
      |> assign(:phone_number, "")

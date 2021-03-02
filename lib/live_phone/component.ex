@@ -43,6 +43,7 @@ defmodule LivePhone.Component do
      socket
      |> assign_new(:preferred, fn -> ["US", "GB"] end)
      |> assign_new(:tabindex, fn -> 0 end)
+     |> assign_new(:apply_format?, fn -> false end)
      |> assign_new(:value, fn -> "" end)
      |> assign(:is_opened?, false)
      |> assign(:is_valid?, false)}
@@ -90,14 +91,17 @@ defmodule LivePhone.Component do
     socket =
       with true <- is_valid?,
            {:ok, country} <- LivePhone.get_country(value) do
+        without_country_code = String.replace(formatted_value, "+#{country.region_code}", "")
+
         socket
         |> assign(:country, country.code)
-        |> assign(:value, String.replace(formatted_value, "+#{country.region_code}", ""))
+        |> assign(:value, without_country_code)
       else
         _ -> socket |> assign(:value, value)
       end
 
     socket
+    |> format_user_input(formatted_value)
     |> assign(:is_valid?, is_valid?)
     |> assign(:formatted_value, formatted_value)
     |> push_event("change", %{value: formatted_value})
@@ -115,11 +119,19 @@ defmodule LivePhone.Component do
   def handle_event("select_country", %{"country" => country}, socket) do
     is_valid? = LivePhone.is_valid?(socket.assigns[:formatted_value])
 
+    placeholder =
+      if socket.assigns[:country] == country do
+        socket.assigns[:placeholder]
+      else
+        get_placeholder(country)
+      end
+
     {:noreply,
      socket
      |> assign_country(country)
      |> assign(:is_valid?, is_valid?)
      |> assign(:is_opened?, false)
+     |> assign(:placeholder, placeholder)
      |> push_event("focus", %{})}
   end
 
@@ -158,6 +170,57 @@ defmodule LivePhone.Component do
   defp assign_country(socket, country) do
     socket
     |> assign(:country, country)
+  end
+
+  @spec format_user_input(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  defp format_user_input(%{assigns: %{apply_format?: false}} = socket, _), do: socket
+  defp format_user_input(socket, ""), do: socket
+  defp format_user_input(socket, "0"), do: socket
+  defp format_user_input(socket, "00"), do: socket
+
+  defp format_user_input(
+         %{assigns: %{formatted_value: formatted_value}} = socket,
+         formatted_value
+       ),
+       do: socket
+
+  defp format_user_input(socket, formatted_value) do
+    with {:ok, country} <- Countries.get_country(socket.assigns[:country]),
+         country_placeholder <- get_placeholder(country.code) do
+      without_country_code =
+        formatted_value
+        |> String.replace("+#{country.region_code}", "")
+        |> String.replace(~r/[^0-9]+/, "")
+        |> String.replace(~r/^0+/, "")
+
+      country_placeholder =
+        country_placeholder
+        |> String.replace(~r/[^0-9]+/, " ")
+        |> String.replace(~r/^0+/, "")
+        |> String.trim()
+
+      {number, remain} =
+        Enum.map_reduce(
+          to_charlist(country_placeholder),
+          to_charlist(without_country_code),
+          fn
+            ?5, [first | digits] -> {first, digits}
+            ?5, [] = digits -> {'•', digits}
+            other, digits -> {other, digits}
+          end
+        )
+
+      user_formatted =
+        [number, remain]
+        |> List.flatten()
+        |> to_string
+        |> String.replace(~r/(•.*)/, "")
+
+      socket
+      |> push_event("format", %{value: user_formatted})
+    else
+      _ -> socket
+    end
   end
 
   @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
