@@ -14,6 +14,7 @@ defmodule LivePhoneTestApp do
         id: "phone",
         form: :user,
         field: :phone,
+        placeholder: "Phone",
         preferred: ["US", "GB", "CA"]
       ) %>
       """

@@ -182,6 +182,44 @@ defmodule LivePhone.ComponentTest do
     assert view |> element("div.live_phone-country") |> render() =~ "🇬🇧 +44"
   end
 
+  test "change placeholder on select country", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    # Placeholder is "Phone" by default
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+
+    # Click the country button
+    assert view |> element("div.live_phone-country") |> render_click()
+
+    # Yes country list
+    assert view |> element("ul.live_phone-country-list") |> has_element?()
+
+    # Click Great Britain
+    assert view |> element("li[phx-value-country=\"GB\"]") |> render_click()
+
+    # Placeholder should change to example number
+    assert view |> element(".live_phone-input[placeholder='055 5555 5555']") |> has_element?()
+  end
+
+  test "change placeholder on select country (unless same country)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    # Placeholder is "Phone" by default
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+
+    # Click the country button
+    assert view |> element("div.live_phone-country") |> render_click()
+
+    # Yes country list
+    assert view |> element("ul.live_phone-country-list") |> has_element?()
+
+    # Click Great Britain
+    assert view |> element("li[phx-value-country=\"US\"]") |> render_click()
+
+    # Placeholder should change to example number
+    assert view |> element(".live_phone-input[placeholder=Phone]") |> has_element?()
+  end
+
   test "close country list on input blur", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
 

@@ -90,9 +90,11 @@ defmodule LivePhone.Component do
     socket =
       with true <- is_valid?,
            {:ok, country} <- LivePhone.get_country(value) do
+        without_country_code = String.replace(formatted_value, "+#{country.region_code}", "")
+
         socket
         |> assign(:country, country.code)
-        |> assign(:value, String.replace(formatted_value, "+#{country.region_code}", ""))
+        |> assign(:value, without_country_code)
       else
         _ -> socket |> assign(:value, value)
       end
@@ -115,11 +117,19 @@ defmodule LivePhone.Component do
   def handle_event("select_country", %{"country" => country}, socket) do
     is_valid? = LivePhone.is_valid?(socket.assigns[:formatted_value])
 
+    placeholder =
+      if socket.assigns[:country] == country do
+        socket.assigns[:placeholder]
+      else
+        get_placeholder(country)
+      end
+
     {:noreply,
      socket
      |> assign_country(country)
      |> assign(:is_valid?, is_valid?)
      |> assign(:is_opened?, false)
+     |> assign(:placeholder, placeholder)
      |> push_event("focus", %{})}
   end
 
