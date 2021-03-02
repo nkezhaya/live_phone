@@ -100,6 +100,7 @@ defmodule LivePhone.Component do
       end
 
     socket
+    |> format_user_input(formatted_value)
     |> assign(:is_valid?, is_valid?)
     |> assign(:formatted_value, formatted_value)
     |> push_event("change", %{value: formatted_value})
@@ -168,6 +169,56 @@ defmodule LivePhone.Component do
   defp assign_country(socket, country) do
     socket
     |> assign(:country, country)
+  end
+
+  @spec format_user_input(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  defp format_user_input(socket, ""), do: socket
+  defp format_user_input(socket, "0"), do: socket
+  defp format_user_input(socket, "00"), do: socket
+
+  defp format_user_input(
+         %{assigns: %{formatted_value: formatted_value}} = socket,
+         formatted_value
+       ),
+       do: socket
+
+  defp format_user_input(socket, formatted_value) do
+    with {:ok, country} <- Countries.get_country(socket.assigns[:country]),
+         country_placeholder <- get_placeholder(country.code) do
+      without_country_code =
+        formatted_value
+        |> String.replace("+#{country.region_code}", "")
+        |> String.replace(~r/[^0-9]+/, "")
+        |> String.replace(~r/^0+/, "")
+
+      country_placeholder =
+        country_placeholder
+        |> String.replace(~r/[^0-9]+/, " ")
+        |> String.replace(~r/^0+/, "")
+        |> String.trim()
+
+      {number, remain} =
+        Enum.map_reduce(
+          to_charlist(country_placeholder),
+          to_charlist(without_country_code),
+          fn
+            ?5, [first | digits] -> {first, digits}
+            ?5, [] = digits -> {'•', digits}
+            other, digits -> {other, digits}
+          end
+        )
+
+      user_formatted =
+        [number, remain]
+        |> List.flatten()
+        |> to_string
+        |> String.replace(~r/(•.*)/, "")
+
+      socket
+      |> push_event("format", %{value: user_formatted})
+    else
+      _ -> socket
+    end
   end
 
   @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()

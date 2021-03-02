@@ -251,4 +251,50 @@ defmodule LivePhone.ComponentTest do
     # Expected normalized value
     assert view |> element("input[type=hidden]") |> render() =~ "value=\"+16502530000\""
   end
+
+  test "reformat while typing", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "424242"})
+    assert_push_event(view, "format", %{value: "424 242 "})
+
+    # Hidden field should keep normalized value
+    assert view |> element("input[type=hidden]") |> render() =~ "value=\"+1424242\""
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
+    assert_push_event(view, "format", %{value: "650 253 0000"})
+
+    assert view |> element("input[type=hidden]") |> render() =~ "value=\"+16502530000\""
+  end
+
+  test "reformat while typing (ignore empty value)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => ""})
+    refute_push_event(view, "format", %{value: ""})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "0"})
+    refute_push_event(view, "format", %{value: "0"})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "00"})
+    refute_push_event(view, "format", %{value: "00"})
+  end
+
+  test "reformat while typing (ignore same value)", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+1 (650) 253-0000"})
+    assert_push_event(view, "format", %{value: "650 253 0000"})
+
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "+16502530000"})
+    refute_push_event(view, "format", %{value: "650 253 0000"})
+  end
+
+  # NOTE: This function does not exist by itself so I just copied and changed the
+  # built-in assert_push_event from LiveView for this purpose.
+  defp refute_push_event(view, event, payload, timeout \\ 100) do
+    %{proxy: {ref, _topic, _}} = view
+
+    refute_receive {^ref, {:push_event, ^event, ^payload}}, timeout
+  end
 end

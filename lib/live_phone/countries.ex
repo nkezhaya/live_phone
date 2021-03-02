@@ -37,6 +37,30 @@ defmodule LivePhone.Countries do
   end
 
   @doc """
+  This function will lookup a `Country` by it's country code.
+
+  ```elixir
+  Examples:
+
+    iex> LivePhone.Countries.get_country("US")
+    {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
+
+    iex> LivePhone.Countries.get_country("FAKE")
+    {:error, :not_found}
+
+  ```
+  """
+  @spec get_country(String.t()) :: {:ok, Country.t()} | {:error, :not_found}
+  def get_country(country_code) do
+    list_countries()
+    |> Enum.find(&(&1.code == country_code))
+    |> case do
+      nil -> {:error, :not_found}
+      country -> {:ok, country}
+    end
+  end
+
+  @doc """
   This function can be used to try and find the `Country` for a specific
   phone number in the `ExPhoneNumber` format.
   """

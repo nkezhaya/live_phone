@@ -72,6 +72,12 @@ class LivePhone {
     this.elements.hiddenField().dispatchEvent(changeEvent)
   }
 
+  // This updates the user visible text field with a formatted
+  // version of the typed number, for this country.
+  setFormat({value: phone}) {
+    this.elements.textField().value = phone
+  }
+
   // Move the currently selected country in the country list overlay
   // one up or down
   shiftSelectedCountry(change) {
@@ -223,6 +229,10 @@ class LivePhone {
     // The "change" event should trigger dispatch on the hidden input
     this.setChange = this.setChange.bind(this)
     this.context.handleEvent("change", this.setChange)
+
+    // The "format" event should display the formatted value
+    this.setFormat = this.setFormat.bind(this)
+    this.context.handleEvent("format", this.setFormat)
 
     // This is used to close the overlay on events that happen outside
     // of our liveview component
