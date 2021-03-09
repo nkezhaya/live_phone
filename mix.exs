@@ -62,7 +62,8 @@ defmodule LivePhone.MixProject do
       {:ecto, "~> 3.5", only: :test},
       {:iso, "~> 1.0"},
       {:floki, ">= 0.27.0", only: :test},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
