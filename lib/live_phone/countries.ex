@@ -8,6 +8,8 @@ defmodule LivePhone.Countries do
   alias ISO
   alias LivePhone.Country
 
+  @type phone() :: %ExPhoneNumber.Model.PhoneNumber{}
+
   @doc """
   This function returns all known countries as `LivePhone.Country` structs,
   sorted alphabetically by country name.
@@ -64,7 +66,7 @@ defmodule LivePhone.Countries do
   This function can be used to try and find the `Country` for a specific
   phone number in the `ExPhoneNumber` format.
   """
-  @spec lookup(ExPhoneNumber.Model.PhoneNumber.t()) :: {:ok, Country.t()} | {:error, :not_found}
+  @spec lookup(phone()) :: {:ok, Country.t()} | {:error, :not_found}
   def lookup(%ExPhoneNumber.Model.PhoneNumber{} = phone) do
     country_code = ExPhoneNumber.Metadata.get_region_code_for_number(phone)
 
