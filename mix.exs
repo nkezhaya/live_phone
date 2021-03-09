@@ -32,6 +32,7 @@ defmodule LivePhone.MixProject do
         "lib/live_phone.ex",
         "lib/live_phone",
         "mix.exs",
+        "package.json",
         "README.md",
         "LICENSE"
       ],
