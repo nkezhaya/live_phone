@@ -28,6 +28,7 @@ defmodule LivePhone.MixProject do
     [
       name: :live_phone,
       files: [
+        "assets",
         "lib/live_phone.ex",
         "lib/live_phone",
         "mix.exs",
