@@ -226,10 +226,8 @@ defmodule LivePhone.Component do
   @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
   defp phone_input(assigns) do
     tag(:input,
-      type: "text",
+      type: "tel",
       class: "live_phone-input",
-      pattern: "[0-9]*",
-      inputmode: "numeric",
       value: assigns[:value],
       tabindex: assigns[:tabindex],
       placeholder: assigns[:placeholder] || get_placeholder(assigns[:country]),

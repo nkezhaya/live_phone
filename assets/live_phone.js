@@ -16,7 +16,7 @@ class LivePhone {
     // since some are managed by LiveView in the back-end
     this.elements = {
       parent: () => context.el,
-      textField: () => context.el.querySelector('input[type="text"]'),
+      textField: () => context.el.querySelector('input[type="tel"]'),
       hiddenField: () => context.el.querySelector('input[type="hidden"]'),
       countrySelector: () => context.el.querySelector('.live_phone-country'),
       countryList: () => context.el.querySelector('.live_phone-country-list'),
