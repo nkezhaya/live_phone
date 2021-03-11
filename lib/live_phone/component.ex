@@ -33,9 +33,6 @@ defmodule LivePhone.Component do
   alias LivePhone.Countries
   alias LivePhone.Country
 
-  alias ExPhoneNumber
-  alias ISO
-
   @impl true
   @spec mount(Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(socket) do
