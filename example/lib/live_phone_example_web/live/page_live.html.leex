@@ -2,7 +2,7 @@
   <h1>LivePhone Demo</h1>
 
   <%= form_tag "#", phx_change: "change", phx_submit: "change" %>
-    <%= live_component(@socket, LivePhone.Component, id: "phone", form: :user, field: :phone, preferred: ["US", "GB", "CA"], placeholder: "Phone") %>
+    <%= live_component(@socket, LivePhone.Component, id: "phone", form: :user, field: :phone, preferred: ["US", "GB", "CA"], apply_format?: true, placeholder: "Phone") %>
   </form>
 </section>
 
