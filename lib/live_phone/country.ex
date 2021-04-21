@@ -21,7 +21,7 @@ defmodule LivePhone.Country do
 
   ## Examples
 
-      iex> ISO.countries() |> Map.to_list() |> List.first() |> LivePhone.Country.from_iso()
+      iex> ISO.countries() |> Map.to_list() |> Enum.find(fn {cc, _} -> cc == "SL" end) |> LivePhone.Country.from_iso()
       %LivePhone.Country{
         preferred: false,
         region_code: "232",
