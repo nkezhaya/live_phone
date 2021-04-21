@@ -13,7 +13,7 @@ by adding `live_phone` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:live_phone, "~> 0.1.0"}
+    {:live_phone, "~> 0.2"}
   ]
 end
 ```
