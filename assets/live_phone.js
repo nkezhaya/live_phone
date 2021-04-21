@@ -69,6 +69,7 @@ class LivePhone {
   // back-end. So this sends a dummy change event to work around it.
   setChange({value: phone}) {
     const changeEvent = new Event('change', {bubbles: true})
+    this.elements.hiddenField().value = phone
     this.elements.hiddenField().dispatchEvent(changeEvent)
   }
 
