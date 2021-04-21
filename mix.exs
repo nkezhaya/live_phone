@@ -56,13 +56,15 @@ defmodule LivePhone.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix_live_view, "~> 0.15"},
-      {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_view, ">= 0.0.0"},
+      {:phoenix_html, ">= 0.0.0"},
+      {:ex_phone_number, ">= 0.0.0"},
+      {:jason, ">= 0.0.0"},
+      {:iso, ">= 0.0.0"},
+
+      # Test/dev deps
       {:phoenix_ecto, "~> 4.0", only: :test},
-      {:ex_phone_number, "~> 0.2.1"},
-      {:jason, "~> 1.0"},
-      {:ecto, "~> 3.5", only: :test},
-      {:iso, "~> 1.0"},
+      {:ecto, "~> 3.6", only: :test},
       {:floki, ">= 0.27.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
