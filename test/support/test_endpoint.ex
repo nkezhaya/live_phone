@@ -35,6 +35,7 @@ defmodule LivePhoneTestApp do
       """
     end
 
+    @impl true
     def handle_event("incr", _params, socket) do
       current = (socket.assigns[:test_counter] || 0) + 1
       {:noreply, assign(socket, test_counter: current)}
