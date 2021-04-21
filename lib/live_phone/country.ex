@@ -1,7 +1,7 @@
 defmodule LivePhone.Country do
   @moduledoc """
-  The `LivePhone.Country` struct holds minimal information about a country,
-  but it should be enough data for `LivePhone` to work it's magic.
+  The `LivePhone.Country` struct holds minimal information about a country, but
+  it should be enough data for `LivePhone` to work it's magic.
   """
 
   alias ExPhoneNumber.Metadata
@@ -40,7 +40,7 @@ defmodule LivePhone.Country do
       }
 
   """
-  @spec from_iso({String.t(), %{String.t() => String.t()}}) :: __MODULE__.t()
+  @spec from_iso({String.t(), %{String.t() => String.t()}}) :: t()
   def from_iso({country_code, %{"name" => name}}) do
     %__MODULE__{
       region_code: find_region_code(country_code),
