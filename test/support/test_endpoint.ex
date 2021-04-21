@@ -27,9 +27,17 @@ defmodule LivePhoneTestApp do
         field: :phone,
         apply_format?: assigns[:apply_format?] == true,
         placeholder: "Phone",
-        preferred: ["US", "GB", "CA"]
+        preferred: ["US", "GB", "CA"],
+        test_counter: assigns[:test_counter]
       ) %>
+
+      <button id="test_incr" phx-click="incr" />
       """
+    end
+
+    def handle_event("incr", _params, socket) do
+      current = (socket.assigns[:test_counter] || 0) + 1
+      {:noreply, assign(socket, test_counter: current)}
     end
   end
 

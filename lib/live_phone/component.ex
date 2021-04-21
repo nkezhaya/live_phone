@@ -50,11 +50,15 @@ defmodule LivePhone.Component do
   @spec update(Phoenix.LiveView.Socket.assigns(), Phoenix.LiveView.Socket.t()) ::
           {:ok, Phoenix.LiveView.Socket.t()}
   def update(assigns, socket) do
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(country: assigns[:country] || hd(assigns[:preferred] || ["US"]))
-     |> set_value()}
+    current_country =
+      assigns[:country] || socket.assigns[:country] || hd(assigns[:preferred] || ["US"])
+
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign_country(current_country)
+
+    {:ok, socket |> set_value()}
   end
 
   @spec set_value(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
@@ -66,20 +70,20 @@ defmodule LivePhone.Component do
   def set_value(socket, value) do
     value =
       case value do
-        "" ->
+        empty when empty in ["", nil] ->
           case socket.assigns do
             %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
               input_value(form, field)
 
-            %{value: value} when not is_nil(value) ->
+            %{value: assigns_value} when not is_nil(assigns_value) ->
               value
 
             _ ->
               value
           end
 
-        value ->
-          value
+        found_value ->
+          found_value
       end || ""
 
     formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
@@ -87,11 +91,11 @@ defmodule LivePhone.Component do
 
     socket =
       with true <- is_valid?,
-           {:ok, country} <- LivePhone.get_country(value) do
+           {:ok, country} <- LivePhone.get_country(formatted_value) do
         without_country_code = String.replace(formatted_value, "+#{country.region_code}", "")
 
         socket
-        |> assign(:country, country.code)
+        |> assign_country(country)
         |> assign(:value, without_country_code)
       else
         _ -> socket |> assign(:value, value)
@@ -163,7 +167,10 @@ defmodule LivePhone.Component do
     end
   end
 
-  @spec assign_country(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  @spec assign_country(Phoenix.LiveView.Socket.t(), Country.t() | String.t()) ::
+          Phoenix.LiveView.Socket.t()
+  defp assign_country(socket, %Country{code: country}), do: assign_country(socket, country)
+
   defp assign_country(socket, country) do
     socket
     |> assign(:country, country)

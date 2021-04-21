@@ -297,11 +297,31 @@ defmodule LivePhone.ComponentTest do
     refute_push_event(view, "format", %{value: "650 253 0000"})
   end
 
+  test "country should persist", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/?format=1")
+
+    # Set country to GB
+    assert view |> element("div.live_phone-country") |> render_click()
+    assert view |> element("li[phx-value-country=\"JP\"]") |> render_click()
+
+    # Type number
+    assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "9020943029"})
+    assert view |> element("div.live_phone-country") |> render() =~ "🇯🇵 +81"
+    assert view |> trigger_update()
+    assert view |> element("div.live_phone-country") |> render() =~ "🇯🇵 +81"
+  end
+
   # NOTE: This function does not exist by itself so I just copied and changed the
   # built-in assert_push_event from LiveView for this purpose.
   defp refute_push_event(view, event, payload, timeout \\ 100) do
     %{proxy: {ref, _topic, _}} = view
 
     refute_receive {^ref, {:push_event, ^event, ^payload}}, timeout
+  end
+
+  # This function is use to trigger the "update" callback on the component,
+  # it just increments a test counter assign that is not used anywhere else.
+  defp trigger_update(view) do
+    view |> element("#test_incr") |> render_click()
   end
 end
