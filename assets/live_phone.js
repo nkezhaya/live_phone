@@ -24,6 +24,9 @@ class LivePhone {
       countryListItemNames: () => context.el.querySelectorAll('.live_phone-country-item-name'),
       selectedCountries: () => context.el.querySelectorAll('.live_phone-country-item[aria-selected="true"]'),
     }
+
+    this.mask = this.elements.textField().dataset.mask
+    this.format()
   }
 
   // Is the country list overlay open/visible?
@@ -73,10 +76,53 @@ class LivePhone {
     this.elements.hiddenField().dispatchEvent(changeEvent)
   }
 
-  // This updates the user visible text field with a formatted
-  // version of the typed number, for this country.
-  setFormat({value: phone}) {
-    this.elements.textField().value = phone
+  // This updates the mask
+  setMask({mask: mask}) {
+    this.mask = mask
+    this.format()
+  }
+
+  // Format the visible input field using the mask
+  format() {
+    if (!this.mask) return
+
+    // Find all typed digits
+    let digits = this.elements.textField().value
+      .replace(/[^0-9]/g, '') // remove all non numeric characters
+      .replace(/^0*/, '') // remove leading zeros (messes it up for some countries)
+      .split('') // turn into array
+    if (!digits.length) return
+
+    // Replace the mask letters with digits
+    let value = this.mask.replace(/[X]/g, match => {
+      let value = digits.shift()
+      if (typeof value !== "string") return "X"
+      return value
+    })
+
+    // Remove everything after the last typed digit
+    let match = value.match(/[0-9]/g)
+    if (match && match.length) {
+      let lastDigitIndex = value.lastIndexOf(match[match.length - 1])
+      value = value.substr(0, lastDigitIndex + 1)
+    }
+
+    this.elements.textField().value = value
+  }
+
+  // While the user typing in the input field we want to auto format it
+  onInput() {
+    this.format()
+  }
+
+  // When the LiveView Component gets updated it will execute this callback
+  onUpdate() {
+    // Update the mask (if there was a previous mask set)
+    let newMask = this.elements.textField().dataset.mask
+    if (this.mask && newMask) {
+      this.mask = newMask
+      this.format()
+    }
   }
 
   // Move the currently selected country in the country list overlay
@@ -231,9 +277,9 @@ class LivePhone {
     this.setChange = this.setChange.bind(this)
     this.context.handleEvent("change", this.setChange)
 
-    // The "format" event should display the formatted value
-    this.setFormat = this.setFormat.bind(this)
-    this.context.handleEvent("format", this.setFormat)
+    // The "mask" event should set the new mask value
+    this.setMask = this.setMask.bind(this)
+    this.context.handleEvent("mask", this.setMask)
 
     // This is used to close the overlay on events that happen outside
     // of our liveview component
@@ -254,6 +300,10 @@ class LivePhone {
     // When switching from country list to input field it should close the overlay
     this.closeOverlay = this.closeOverlay.bind(this)
     this.elements.textField().addEventListener("focus", this.closeOverlay, false)
+
+    // This will help formatting input
+    this.onInput = this.onInput.bind(this)
+    this.elements.textField().addEventListener("input", this.onInput, false)
   }
 
   unbindEvents() {
@@ -268,6 +318,7 @@ class LivePhone {
     // this part of the cleanup conditional.
     const textField = this.elements.textField()
     if (textField) textField.removeEventListener("focus", this.closeOverlay, false)
+    if (textField) textField.removeEventListener("input", this.onInput, false)
   }
 }
 
@@ -276,6 +327,10 @@ module.exports = {
   mounted() {
     this.instance = new LivePhone(this)
     this.instance.bindEvents()
+  },
+
+  updated() {
+    this.instance.onUpdate()
   },
 
   destroyed() {

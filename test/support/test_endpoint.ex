@@ -6,12 +6,6 @@ defmodule LivePhoneTestApp do
     use Phoenix.LiveView
 
     @impl true
-    def handle_params(%{"format" => "1"}, _session, socket) do
-      {:noreply,
-       socket
-       |> assign(apply_format?: true)}
-    end
-
     def handle_params(_params, _session, socket) do
       {:noreply, socket}
     end
@@ -25,7 +19,6 @@ defmodule LivePhoneTestApp do
         id: "phone",
         form: :user,
         field: :phone,
-        apply_format?: assigns[:apply_format?] == true,
         placeholder: "Phone",
         preferred: ["US", "GB", "CA"],
         test_counter: assigns[:test_counter]
