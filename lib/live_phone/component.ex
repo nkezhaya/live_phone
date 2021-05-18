@@ -152,18 +152,55 @@ defmodule LivePhone.Component do
     country
     |> ExPhoneNumber.Metadata.get_for_region_code()
     |> case do
-      %{fixed_line: %{example_number: number}} ->
+      %{country_code: country_code, fixed_line: %{example_number: number}} ->
         number
         |> String.replace(~r/\d/, "5")
         |> ExPhoneNumber.parse(country)
         |> case do
           {:ok, result} ->
-            result |> ExPhoneNumber.format(:national)
+            result
+            |> ExPhoneNumber.format(:international)
+            |> String.replace(~r/^(\+|00)#{country_code}/, "")
+            |> String.trim()
 
           _ ->
             ""
         end
     end
+  end
+
+  @spec get_masks(String.t()) :: [String.t()]
+  defp get_masks(country) do
+    metadata = ExPhoneNumber.Metadata.get_for_region_code(country)
+
+    # Iterate through all metadata to find phone number descriptions
+    # with example numbers only, and return those example numbers
+    metadata
+    |> Map.from_struct()
+    |> Enum.map(fn
+      {_, %ExPhoneNumber.Metadata.PhoneNumberDescription{} = desc} -> desc.example_number
+      _other -> nil
+    end)
+    |> Enum.filter(& &1)
+
+    # Parse all example numbers with the country and only keep valid ones
+    |> Enum.map(&ExPhoneNumber.parse(&1, country))
+    |> Enum.map(fn
+      {:ok, parsed} -> parsed
+      _other -> nil
+    end)
+    |> Enum.filter(& &1)
+
+    # Format all parsed numbers with the international format
+    # but removing the leading country_code. Transform all digits to X
+    # to be used for a mask
+    |> Enum.map(&ExPhoneNumber.format(&1, :international))
+    |> Enum.map(&String.replace(&1, ~r/^(\+|00)#{metadata.country_code}/, ""))
+    |> Enum.map(&String.replace(&1, ~r/\d/, "X"))
+    |> Enum.map(&String.trim/1)
+
+    # And make sure we only have unique ones
+    |> Enum.uniq()
   end
 
   @spec assign_country(Phoenix.LiveView.Socket.t(), Country.t() | String.t()) ::
@@ -177,9 +214,11 @@ defmodule LivePhone.Component do
 
   @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
   defp phone_input(assigns) do
-    mask =
+    masks =
       if assigns.apply_format? do
-        get_placeholder(assigns[:country]) |> String.replace("5", "X")
+        assigns[:country]
+        |> get_masks()
+        |> Enum.join(",")
       else
         nil
       end
@@ -190,7 +229,7 @@ defmodule LivePhone.Component do
       value: assigns[:value],
       tabindex: assigns[:tabindex],
       placeholder: assigns[:placeholder] || get_placeholder(assigns[:country]),
-      data_mask: mask,
+      data_masks: masks,
       phx_target: assigns[:myself],
       phx_keyup: "typing",
       phx_blur: "close"
