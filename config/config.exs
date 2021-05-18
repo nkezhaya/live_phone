@@ -10,8 +10,15 @@ if Mix.env() == :test do
     url: [host: "localhost"],
     secret_key_base: "DC7N7zO/AVr5qqVk+ZRAm1PM4arGnoZ7847JlrRmUknGCbFIdcL14+wF9Ws085mU",
     live_view: [signing_salt: "NsyigQtD"],
-    server: false
+    pubsub_server: LivePhoneTestApp.PubSub,
+    server: true
 
   # Print only warnings and errors during test
   config :logger, level: :warn
+
+  config :hound,
+    driver: "chrome_driver",
+    browser: "chrome_headless",
+    app_port: 4002,
+    host: "http://127.0.0.1"
 end
