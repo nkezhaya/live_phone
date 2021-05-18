@@ -34,6 +34,7 @@ defmodule LivePhone.Countries do
     ISO.countries()
     |> Enum.map(&Country.from_iso/1)
     |> Enum.map(&set_preferred_flag(&1, preferred))
+    |> Enum.filter(&(&1.region_code && &1.region_code != ""))
     |> Enum.sort(&sort_by_name/2)
     |> Enum.sort_by(&sort_by_preferred(&1, preferred), :desc)
   end
