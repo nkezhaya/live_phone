@@ -17,6 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: setup-chromedriver
+      uses: nanasess/setup-chromedriver@v1.0.1
+    - run: |
+        export DISPLAY=:99
+        chromedriver --url-base=/wd/hub &
+
     - name: Set up Elixir
       uses: erlef/setup-elixir@v1
       with:
