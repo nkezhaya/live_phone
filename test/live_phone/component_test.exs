@@ -39,6 +39,30 @@ defmodule LivePhone.ComponentTest do
     assert component =~ "placeholder=\"Phone Number\""
   end
 
+  test "support setting mask (single)" do
+    component =
+      render_component(LivePhone.Component,
+        id: "livephone",
+        apply_format?: true,
+        placeholder: "Phone Number"
+      )
+
+    assert component =~ "masks=\"XXX-XXX-XXXX\""
+  end
+
+  test "support setting mask (multiple)" do
+    component =
+      render_component(LivePhone.Component,
+        id: "livephone",
+        apply_format?: true,
+        country: "SE",
+        placeholder: "Phone Number"
+      )
+
+    assert component =~
+             "masks=\"X XX XX XX,XX XXX XX XX,XXX XX XX XXX,XX XX XX XX,XXX XX XXX XX XX\""
+  end
+
   test "support setting form and field from changeset (new)" do
     use Phoenix.HTML
 
@@ -198,7 +222,7 @@ defmodule LivePhone.ComponentTest do
     assert view |> element("li[phx-value-country=\"GB\"]") |> render_click()
 
     # Placeholder should change to example number
-    assert view |> element(".live_phone-input[placeholder='055 5555 5555']") |> has_element?()
+    assert view |> element(".live_phone-input[placeholder='55 5555 5555']") |> has_element?()
   end
 
   test "change placeholder on select country (unless same country)", %{conn: conn} do

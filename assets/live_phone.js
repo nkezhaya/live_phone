@@ -1,5 +1,18 @@
 const scrollIntoFn = 'scrollIntoView' in Element.prototype ? 'scrollIntoViewIfNeeded' : scrollIntoView
 
+
+const digitsOnly = input =>
+  input
+  .replace(/[^0-9]/g, '') // remove all non numeric characters
+  .replace(/^0*/, '') // remove leading zeros (messes it up for some countries)
+  .split('') // turn into array
+
+const maskSize = input =>
+  input
+  .replace(/[^X]/g, '') // remove all non masked characters
+  .split('') // turn into array
+  .length // return length
+
 class LivePhone {
   constructor(context) {
     // This contains the original context of the LiveView Hook
@@ -25,7 +38,12 @@ class LivePhone {
       selectedCountries: () => context.el.querySelectorAll('.live_phone-country-item[aria-selected="true"]'),
     }
 
-    this.mask = this.elements.textField().dataset.mask
+    let masks = this.elements.textField().dataset.masks;
+    if (masks) {
+      this.masks = masks.split(/\s*,\s*/g)
+    } else {
+      this.masks = []
+    }
     this.format()
   }
 
@@ -77,24 +95,33 @@ class LivePhone {
   }
 
   // This updates the mask
-  setMask({mask: mask}) {
-    this.mask = mask
+  setMask({masks: masks}) {
+    this.masks = masks
     this.format()
   }
 
-  // Format the visible input field using the mask
+  // Format the visible input field using the best-match mask
   format() {
-    if (!this.mask) return
+    if (!this.masks) return
 
     // Find all typed digits
-    let digits = this.elements.textField().value
-      .replace(/[^0-9]/g, '') // remove all non numeric characters
-      .replace(/^0*/, '') // remove leading zeros (messes it up for some countries)
-      .split('') // turn into array
+    let digits = digitsOnly(this.elements.textField().value)
     if (!digits.length) return
 
+    // Find the best-match mask based on digit and mask lengths
+    let [currentMask] = this.masks
+      .filter(mask => maskSize(mask) >= digits.length)
+      .sort((a, b) => {
+        let sizeA = maskSize(a)
+        let sizeB = maskSize(b)
+        if (sizeA < sizeB) return -1
+        if (sizeA > sizeB) return 1
+        return 0
+      })
+    if (!currentMask) return
+
     // Replace the mask letters with digits
-    let value = this.mask.replace(/[X]/g, match => {
+    let value = currentMask.replace(/[X]/g, match => {
       let value = digits.shift()
       if (typeof value !== "string") return "X"
       return value
@@ -117,10 +144,10 @@ class LivePhone {
 
   // When the LiveView Component gets updated it will execute this callback
   onUpdate() {
-    // Update the mask (if there was a previous mask set)
-    let newMask = this.elements.textField().dataset.mask
-    if (this.mask && newMask) {
-      this.mask = newMask
+    // Update the masks (if there were previous masks set)
+    let newMasks = this.elements.textField().dataset.masks
+    if (this.masks && newMasks) {
+      // this.masks = newMask
       this.format()
     }
   }
@@ -276,10 +303,6 @@ class LivePhone {
     // The "change" event should trigger dispatch on the hidden input
     this.setChange = this.setChange.bind(this)
     this.context.handleEvent("change", this.setChange)
-
-    // The "mask" event should set the new mask value
-    this.setMask = this.setMask.bind(this)
-    this.context.handleEvent("mask", this.setMask)
 
     // This is used to close the overlay on events that happen outside
     // of our liveview component

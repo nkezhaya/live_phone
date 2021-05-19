@@ -67,7 +67,11 @@ defmodule LivePhone.MixProject do
       {:ecto, "~> 3.6", only: :test},
       {:floki, ">= 0.27.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+
+      # Browser tests
+      {:plug_cowboy, "~> 2.0", only: :test},
+      {:hound, "~> 1.0", only: :test}
     ]
   end
 
