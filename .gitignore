@@ -22,9 +22,5 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 live_phone-*.tar
 
-
 # Temporary files for e.g. tests
 /tmp
-
-# we only use /priv/assets for browser tests
-/priv/assets
