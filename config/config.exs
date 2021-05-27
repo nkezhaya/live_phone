@@ -20,5 +20,6 @@ if Mix.env() == :test do
     driver: "chrome_driver",
     browser: "chrome_headless",
     app_port: 4002,
-    host: "http://127.0.0.1"
+    host: "http://127.0.0.1",
+    path_prefix: "wd/hub/"
 end
