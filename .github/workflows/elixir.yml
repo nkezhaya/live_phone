@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    types: [ ready_for_review ]
+    branches: [ master ]
 
 jobs:
   build:
