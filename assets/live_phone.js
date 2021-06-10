@@ -320,13 +320,38 @@ class LivePhone {
     this.findPartialMatch = this.findPartialMatch.bind(this)
     document.body.addEventListener('keypress', this.findPartialMatch, false)
 
+    // Get reference to textField element
+    const textField = this.elements.textField()
+    if (!textField) return
+
     // When switching from country list to input field it should close the overlay
     this.closeOverlay = this.closeOverlay.bind(this)
-    this.elements.textField().addEventListener("focus", this.closeOverlay, false)
+    textField.addEventListener("focus", this.closeOverlay, false)
 
     // This will help formatting input
     this.onInput = this.onInput.bind(this)
-    this.elements.textField().addEventListener("input", this.onInput, false)
+    textField.addEventListener("input", this.onInput, false)
+
+    // Some custom code for improved autofill support, which does not always
+    // trigger the correct events and cannot be observed with the MutationObserver
+    const proto = Object.getPrototypeOf(textField)
+    if (!proto || !proto.hasOwnProperty("value")) return
+    const descriptor = Object.getOwnPropertyDescriptor(proto, "value")
+    Object.defineProperty(textField, "value", {
+      get() {
+        return descriptor.get.apply(this, arguments)
+      },
+
+      set() {
+        let previous = this.value
+        descriptor.set.apply(this, arguments)
+        if (this.value != previous.value) requestAnimationFrame(_ => {
+          const changeEvent = new Event('keyup', {bubbles: true})
+          textField.dispatchEvent(changeEvent)
+        })
+        return this.value
+      }
+    })
   }
 
   unbindEvents() {
