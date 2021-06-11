@@ -147,7 +147,7 @@ class LivePhone {
     // Update the masks (if there were previous masks set)
     let newMasks = this.elements.textField().dataset.masks
     if (this.masks && newMasks) {
-      // this.masks = newMask
+      this.masks = newMasks.split(/\s*,\s*/g)
       this.format()
     }
   }
