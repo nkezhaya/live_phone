@@ -41,7 +41,7 @@ defmodule LivePhoneTestApp do
 
       <button id="test_incr" phx-click="incr" />
       <script type="text/javascript" src="/js/phoenix.js"></script>
-      <script type="text/javascript" src="/js/live_view.js"></script>
+      <script type="text/javascript" src="/js/phoenix_live_view.js"></script>
       <script type="text/javascript">var module = {exports: {}}</script>
       <script type="text/javascript" src="/js/live_phone.js"></script>
       <script type="text/javascript">
