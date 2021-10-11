@@ -61,6 +61,21 @@ defmodule LivePhone.Component do
     {:ok, socket |> set_value()}
   end
 
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class={"live_phone #{if @is_valid?, do: " live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
+      <%= country_selector(assigns) %>
+
+      <%= phone_input(assigns) %>
+
+      <%= hidden_phone_input(assigns) %>
+
+      <%= country_list(assigns) %>
+    </div>
+    """
+  end
+
   @spec set_value(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
   def set_value(socket) do
     set_value(socket, socket.assigns[:value])
