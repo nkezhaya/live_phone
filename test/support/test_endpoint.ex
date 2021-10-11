@@ -85,7 +85,7 @@ defmodule LivePhoneTestApp do
 
     scope "/" do
       pipe_through(:browser)
-      live("/", Page, :index, as: "index")
+      live("/", Page, :index, as: :index)
     end
   end
 
