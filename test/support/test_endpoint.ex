@@ -47,9 +47,9 @@ defmodule LivePhoneTestApp do
         <script type="text/javascript" src="/js/live_phone.js"></script>
         <script type="text/javascript">
         let phx = Phoenix
-        let phxLV = phoenix_live_view
+        let phxLV = LiveView
         let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        var liveSocket = new phoenix_live_view.LiveSocket(
+        var liveSocket = new LiveView.LiveSocket(
           "/live",
           Phoenix.Socket, {
             hooks: {
