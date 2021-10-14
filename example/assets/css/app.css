@@ -1,9 +1,5 @@
 /* This file is for your main application css. */
 @import "./phoenix.css";
-@import "../node_modules/nprogress/nprogress.css";
-
-// @import "../../deps/live_phone/assets/live_phone";
-@import "../../assets/live_phone";
 
 /* LiveView specific classes for your customizations */
 .phx-no-feedback.invalid-feedback,

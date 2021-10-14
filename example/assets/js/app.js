@@ -1,7 +1,8 @@
 // We need to import the CSS so that webpack will load it.
 // The MiniCssExtractPlugin is used to separate it out into
 // its own CSS file.
-import "../css/app.scss"
+import "../css/app.css"
+import "../../../assets/live_phone.css"
 
 // webpack automatically bundles all modules in your
 // entry points. Those entry points can be configured
@@ -12,10 +13,9 @@ import "../css/app.scss"
 //     import {Socket} from "phoenix"
 //     import socket from "./socket"
 //
-import "phoenix_html"
-import {Socket} from "phoenix"
-import NProgress from "nprogress"
-import {LiveSocket} from "phoenix_live_view"
+import "../../deps/phoenix_html"
+import {Socket} from "../../deps/phoenix"
+import {LiveSocket} from "../../deps/phoenix_live_view"
 
 // Load and specify the LivePhone Component Hook
 import LivePhone from "../../../assets/live_phone"
@@ -29,10 +29,6 @@ let liveSocket = new LiveSocket("/live", Socket, {
     _csrf_token: csrfToken
   }
 })
-
-// Show progress bar on live navigation and form submits
-window.addEventListener("phx:page-loading-start", info => NProgress.start())
-window.addEventListener("phx:page-loading-stop", info => NProgress.done())
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

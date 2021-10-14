@@ -33,16 +33,17 @@ defmodule LivePhoneExample.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.7"},
-      {:phoenix_live_view, "~> 0.15.0"},
-      {:floki, ">= 0.27.0", only: :test},
-      {:phoenix_html, "~> 2.11"},
+      {:phoenix, "~> 1.6"},
+      {:phoenix_live_view, "~> 0.16"},
+      {:esbuild, "~> 0.2"},
+      {:floki, ">= 0.31.0", only: :test},
+      {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
+      {:jason, "~> 1.2"},
+      {:plug_cowboy, "~> 2.5"},
       {:live_phone, path: "../"}
     ]
   end
@@ -55,7 +56,9 @@ defmodule LivePhoneExample.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "cmd npm install --prefix assets"]
+      setup: ["deps.get"],
+      "assets.build": ["esbuild default --minify"],
+      "assets.deploy": ["assets.build", "phx.digest"]
     ]
   end
 end
