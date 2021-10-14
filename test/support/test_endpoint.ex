@@ -24,41 +24,43 @@ defmodule LivePhoneTestApp do
 
     @impl true
     def render(assigns) do
-      ~L"""
-      <%= csrf_meta_tag() %>
+      ~H"""
+      <body>
+        <%= csrf_meta_tag() %>
 
-      <%= live_component(
-        assigns[:socket],
-        LivePhone.Component,
-        id: "phone",
-        form: :user,
-        field: :phone,
-        apply_format?: assigns[:format?],
-        placeholder: "Phone",
-        preferred: ["US", "GB", "CA"],
-        test_counter: assigns[:test_counter]
-      ) %>
+        <%= live_component(
+          assigns[:socket],
+          LivePhone.Component,
+          id: "phone",
+          form: :user,
+          field: :phone,
+          apply_format?: assigns[:format?],
+          placeholder: "Phone",
+          preferred: ["US", "GB", "CA"],
+          test_counter: assigns[:test_counter]
+        ) %>
 
-      <button id="test_incr" phx-click="incr" />
-      <script type="text/javascript" src="/js/phoenix.js"></script>
-      <script type="text/javascript" src="/js/phoenix_live_view.js"></script>
-      <script type="text/javascript">var module = {exports: {}}</script>
-      <script type="text/javascript" src="/js/live_phone.js"></script>
-      <script type="text/javascript">
-      let phx = Phoenix
-      let phxLV = phoenix_live_view
-      let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      var liveSocket = new phoenix_live_view.LiveSocket(
-        "/live",
-        Phoenix.Socket, {
-          hooks: {
-            LivePhone: module.exports
-          },
-          params: {_csrf_token: csrfToken}
-        }
-      )
-      liveSocket.connect()
-      </script>
+        <button id="test_incr" phx-click="incr" />
+        <script type="text/javascript" src="/js/phoenix.js"></script>
+        <script type="text/javascript" src="/js/phoenix_live_view.js"></script>
+        <script type="text/javascript">var module = {exports: {}}</script>
+        <script type="text/javascript" src="/js/live_phone.js"></script>
+        <script type="text/javascript">
+        let phx = Phoenix
+        let phxLV = phoenix_live_view
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        var liveSocket = new phoenix_live_view.LiveSocket(
+          "/live",
+          Phoenix.Socket, {
+            hooks: {
+              LivePhone: module.exports
+            },
+            params: {_csrf_token: csrfToken}
+          }
+        )
+        liveSocket.connect()
+        </script>
+      </body>
       """
     end
 
