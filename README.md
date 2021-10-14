@@ -47,7 +47,9 @@ In the `example/` directory you will find a very minimal Phoenix application to 
 ## Browser Tests (chromedriver)
 To run the browser tests you need to install `chromedriver` (`brew install chromedriver` on MacOS) and it has to be running already. The tests are excluded by default, but you can include them with `--include browser`. See below:
 
+An "invalid session id" error can usually be fixed by upgrading chromedriver.
+
 ```
-$ chromedriver # hound assumes default port 9515)
+$ chromedriver --verbose --url-base=/wd/hub # hound assumes default port 9515)
 $ mix test --include browser
 ```
