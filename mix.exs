@@ -6,7 +6,7 @@ defmodule LivePhone.MixProject do
   def project do
     [
       app: :live_phone,
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
