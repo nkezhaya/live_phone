@@ -280,8 +280,11 @@ defmodule LivePhone.Component do
           nil -> ""
           code -> "+#{code.country_code}"
         end
-
-      "#{emoji} #{region_code}"
+      
+      [
+        content_tag(:span, emoji, class: "live_phone-country-flag"),
+        content_tag(:span, region_code, class: "live_phone-country-code")
+      ]
     end
   end
 

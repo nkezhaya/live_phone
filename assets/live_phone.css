@@ -50,6 +50,11 @@ input.live_phone-input,
   background: #E0E0E0;
 }
 
+.live_phone-country-flag {
+  display: inline-block;
+  margin-right: 5px;
+}
+
 input.live_phone-input {
   flex: 1;
   margin: 0;
