@@ -203,7 +203,8 @@ defmodule LivePhone.ComponentTest do
     refute view |> element("ul.live_phone-country-list") |> has_element?()
 
     # Country button should now be Great Britain
-    assert view |> element("div.live_phone-country") |> render() =~ "🇬🇧 +44"
+    assert view |> element("span.live_phone-country-code") |> render() =~ "+44"
+    assert view |> element("span.live_phone-country-flag") |> render() =~ "🇬🇧"
   end
 
   test "change placeholder on select country", %{conn: conn} do
@@ -285,9 +286,11 @@ defmodule LivePhone.ComponentTest do
 
     # Type number
     assert view |> element(".live_phone-input") |> render_keyup(%{"value" => "9020943029"})
-    assert view |> element("div.live_phone-country") |> render() =~ "🇯🇵 +81"
+    assert view |> element("span.live_phone-country-code") |> render() =~ "+81"
+    assert view |> element("span.live_phone-country-flag") |> render() =~ "🇯🇵"
     assert view |> trigger_update()
-    assert view |> element("div.live_phone-country") |> render() =~ "🇯🇵 +81"
+    assert view |> element("span.live_phone-country-code") |> render() =~ "+81"
+    assert view |> element("span.live_phone-country-flag") |> render() =~ "🇯🇵"
   end
 
   # This function is use to trigger the "update" callback on the component,
