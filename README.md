@@ -1,4 +1,5 @@
 [![Actions Status](https://github.com/nkezhaya/live_phone/actions/workflows/elixir.yml/badge.svg)](https://github.com/nkezhaya/live_phone/actions/workflows/elixir.yml?query=workflow%3ACI)
+[![hex.pm](https://img.shields.io/hexpm/v/live_phone.svg)](https://hexdocs.pm/live_phone/LivePhone.html)
 
 # LivePhone
 
