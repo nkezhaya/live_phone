@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/nkezhaya/live_phone/actions/workflows/elixir.yml/badge.svg)](https://github.com/nkezhaya/live_phone/actions/workflows/elixir.yml?query=workflow%3ACI)
+
 # LivePhone
 
 A Phoenix LiveView Component for phone number input fields, basically a [`intl-tel-input` ](https://github.com/jackocnr/intl-tel-input) for Phoenix LiveView.
