@@ -280,7 +280,7 @@ defmodule LivePhone.Component do
           nil -> ""
           code -> "+#{code.country_code}"
         end
-      
+
       [
         content_tag(:span, emoji, class: "live_phone-country-flag"),
         content_tag(:span, region_code, class: "live_phone-country-code")
@@ -288,10 +288,9 @@ defmodule LivePhone.Component do
     end
   end
 
-  @spec country_list(%{is_opened?: boolean()}) :: nil
+  @spec country_list(map()) :: nil | Phoenix.HTML.Safe.t()
   defp country_list(%{is_opened?: false}), do: nil
 
-  @spec country_list(%{country: String.t()}) :: Phoenix.HTML.Safe.t()
   defp country_list(%{country: country} = assigns) do
     preferred_countries = [country | assigns[:preferred]]
 
