@@ -2,7 +2,7 @@
   <h1>LivePhone Demo</h1>
 
   <.form for={:user} phx-change="change" phx-submit="change">
-    <.live_component module={LivePhone.Component} id="phone", form={:user} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone" />
+    <.live_component module={LivePhone.Component} id="phone" form={:user} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone" />
   </.form>
 </section>
 
