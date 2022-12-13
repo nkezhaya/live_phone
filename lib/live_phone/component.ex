@@ -148,7 +148,10 @@ defmodule LivePhone.Component do
     |> assign(:formatted_value, formatted_value)
     |> then(fn socket ->
       if push? do
-        push_event(socket, "change", %{value: formatted_value})
+        push_event(socket, "change", %{
+          id: "live_phone-#{socket.assigns.id}",
+          value: formatted_value
+        })
       else
         socket
       end
@@ -178,7 +181,7 @@ defmodule LivePhone.Component do
      |> assign(:is_valid?, is_valid?)
      |> assign(:is_opened?, false)
      |> assign(:placeholder, placeholder)
-     |> push_event("focus", %{})}
+     |> push_event("focus", %{id: "live_phone-#{socket.assigns.id}"})}
   end
 
   def handle_event("toggle", _, socket) do

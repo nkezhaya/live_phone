@@ -81,14 +81,18 @@ class LivePhone {
   }
 
   // Move the focus to our (visible) textfield
-  setFocus() {
+  setFocus({ id }) {
+    if (id !== this.context.el.id) return
+
     this.elements.textField().focus()
   }
 
   // This has to happen because the `phx-change` event was not
   // always called correctly when updating the value from the
   // back-end. So this sends a dummy change event to work around it.
-  setChange({ value }) {
+  setChange({ id, value }) {
+    if (id !== this.context.el.id) return
+
     const opts = { bubbles: true, cancelable: true }
     const changeEvent = new Event('input', opts)
     const changed = this.elements.hiddenField().value !== value
