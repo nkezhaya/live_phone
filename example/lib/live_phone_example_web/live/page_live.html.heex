@@ -1,8 +1,8 @@
 <section class="phx-hero">
   <h1>LivePhone Demo</h1>
 
-  <.form :let={f} for={@changeset} as="phone" phx-change="change" phx-submit="submit">
-    <.live_component module={LivePhone.Component} id="phone" form={:user} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone" />
+  <.form :let={f} for={@changeset} as={:phone} phx-change="change" phx-submit="submit">
+    <.live_component module={LivePhone.Component} id="phone" form={f} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone" />
 
     <button type="submit" class="mt-2">Submit</button>
   </.form>

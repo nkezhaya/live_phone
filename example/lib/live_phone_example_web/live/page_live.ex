@@ -18,7 +18,7 @@ defmodule LivePhoneExampleWeb.PageLive do
   end
 
   @impl true
-  def handle_event("change", %{"user" => %{"phone" => phone} = params}, socket) do
+  def handle_event("change", %{"phone" => %{"phone" => phone} = params}, socket) do
     {:noreply,
      socket
      |> assign(:phone_number, phone)
@@ -26,7 +26,7 @@ defmodule LivePhoneExampleWeb.PageLive do
      |> assign(:valid?, LivePhone.is_valid?(phone))}
   end
 
-  def handle_event("submit", %{"user" => %{"phone" => phone}}, socket) do
+  def handle_event("submit", %{"phone" => %{"phone" => phone}}, socket) do
     PhoneStorage.put_phone(phone)
 
     {:noreply, redirect(socket, to: "/")}
