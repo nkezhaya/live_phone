@@ -66,7 +66,7 @@ defmodule LivePhone.Component do
       |> assign_country(current_country)
       |> assign(:masks, masks)
 
-    {:ok, socket |> set_value()}
+    {:ok, set_value(socket)}
   end
 
   @impl true
@@ -141,19 +141,25 @@ defmodule LivePhone.Component do
         _ -> socket |> assign(:value, value)
       end
 
+    push? = socket.assigns[:formatted_value] != formatted_value
+
     socket
     |> assign(:is_valid?, is_valid?)
     |> assign(:formatted_value, formatted_value)
-    |> push_event("change", %{value: formatted_value})
+    |> then(fn socket ->
+      if push? do
+        push_event(socket, "change", %{value: formatted_value})
+      else
+        socket
+      end
+    end)
   end
 
   @impl true
   @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) ::
           {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("typing", %{"value" => value}, socket) do
-    {:noreply,
-     socket
-     |> set_value(value)}
+    {:noreply, set_value(socket, value)}
   end
 
   def handle_event("select_country", %{"country" => country}, socket) do

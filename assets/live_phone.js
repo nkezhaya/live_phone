@@ -89,12 +89,12 @@ class LivePhone {
   // always called correctly when updating the value from the
   // back-end. So this sends a dummy change event to work around it.
   setChange({ value }) {
-    const changeEvent = new Event('input', { bubbles: true, cancelable: true })
+    const opts = { bubbles: true, cancelable: true }
+    const changeEvent = new Event('input', opts)
     const changed = this.elements.hiddenField().value !== value
-    if (changed) {
-      this.elements.hiddenField().value = value
-      this.elements.hiddenField().dispatchEvent(changeEvent)
-    }
+
+    this.elements.hiddenField().value = value
+    this.elements.hiddenField().dispatchEvent(changeEvent)
   }
 
   // This updates the mask
