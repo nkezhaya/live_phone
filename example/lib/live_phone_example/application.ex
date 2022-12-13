@@ -9,6 +9,8 @@ defmodule LivePhoneExample.Application do
     children = [
       # Start the Telemetry supervisor
       LivePhoneExampleWeb.Telemetry,
+      # Start the phone storage agent
+      LivePhoneExample.PhoneStorage,
       # Start the PubSub system
       {Phoenix.PubSub, name: LivePhoneExample.PubSub},
       # Start the Endpoint (http/https)

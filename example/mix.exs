@@ -38,10 +38,12 @@ defmodule LivePhoneExample.MixProject do
       {:esbuild, "~> 0.5"},
       {:floki, ">= 0.34.0", only: :test},
       {:phoenix_html, "~> 3.2"},
+      {:phoenix_ecto, "~> 4.4"},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.4"},
       {:plug_cowboy, "~> 2.6"},
+      {:ecto, "~> 3.9"},
       {:live_phone, path: "../"}
     ]
   end
