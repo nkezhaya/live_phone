@@ -71,7 +71,9 @@ defmodule LivePhone.Component do
 
       <%= hidden_phone_input(assigns) %>
 
-      <%= country_list(assigns) %>
+      <%= if @is_opened? do %>
+        <%= country_list(assigns) %>
+      <% end %>
     </div>
     """
   end
@@ -288,63 +290,54 @@ defmodule LivePhone.Component do
     end
   end
 
-  @spec country_list(map()) :: nil | Phoenix.HTML.Safe.t()
-  defp country_list(%{is_opened?: false}), do: nil
-
-  defp country_list(%{country: country} = assigns) do
-    preferred_countries = [country | assigns[:preferred]]
-
-    content_tag(:ul,
-      role: "listbox",
-      class: "live_phone-country-list",
-      id: "live_phone-country-list-#{assigns[:id]}"
-    ) do
-      countries = Countries.list_countries(preferred_countries)
-      last_preferred = countries |> Enum.filter(& &1.preferred) |> List.last()
-
-      for country <- countries do
-        output = [country_list_item(assigns, country)]
-
-        if last_preferred == country do
-          output ++ [country_list_separator()]
-        else
-          output
-        end
+  defp country_list(assigns) do
+    assigns =
+      if assigns[:country] do
+        assign(assigns, :preferred, [assigns[:country] | assigns[:preferred]])
+      else
+        assigns
       end
-    end
+
+    assigns =
+      assign_new(assigns, :countries, fn -> Countries.list_countries(assigns[:preferred]) end)
+
+    assigns =
+      assign_new(assigns, :last_preferred, fn ->
+        assigns[:countries]
+        |> Enum.filter(& &1.preferred)
+        |> List.last()
+      end)
+
+    ~H"""
+    <ul class="live_phone-country-list" id={"live_phone-country-list-#{@id}"} role="listbox">
+      <%= for country <- @countries do %>
+        <.country_list_item country={country} current_country={@country} target={@myself} />
+
+        <%= if country == @last_preferred do %>
+          <li role="separator" class="live_phone-country-separator" aria-disabled="true">
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+    """
   end
 
-  @spec country_list_item(Phoenix.LiveView.Socket.assigns(), Country.t()) :: Phoenix.HTML.Safe.t()
-  defp country_list_item(assigns, %Country{} = country) do
-    selected? = country.code == assigns[:country]
+  defp country_list_item(assigns) do
+    selected? = assigns[:country].code == assigns[:current_country]
+    assigns = assign(assigns, :selected?, selected?)
 
     class = ["live_phone-country-item"]
-    class = if selected?, do: ["selected" | class], else: class
-    class = if country.preferred, do: ["preferred" | class], else: class
+    class = if assigns[:selected?], do: ["selected" | class], else: class
+    class = if assigns[:country].preferred, do: ["preferred" | class], else: class
 
-    content_tag(:li,
-      role: "option",
-      class: Enum.join(class, " "),
-      aria_selected: if(selected?, do: "true", else: "false"),
-      phx_target: assigns[:myself],
-      phx_click: "select_country",
-      phx_value_country: country.code
-    ) do
-      [
-        content_tag(:span, country.flag_emoji, class: "live_phone-country-item-flag"),
-        content_tag(:span, country.name, class: "live_phone-country-item-name"),
-        content_tag(:span, "+" <> country.region_code, class: "live_phone-country-item-code")
-      ]
-    end
-  end
+    assigns = assign(assigns, :class, class)
 
-  @spec country_list_separator() :: Phoenix.HTML.Safe.t()
-  defp country_list_separator do
-    content_tag(:li,
-      role: "separator",
-      aria_disabled: "true",
-      class: "live_phone-country-separator"
-    ) do
-    end
+    ~H"""
+    <li role="option" class={@class} aria-selected={@selected?} phx-target={@target} phx-click="select_country" phx-value-country={@country.code}>
+      <span class="live_phone-country-item-flag"><%= @country.flag_emoji %></span>
+      <span class="live_phone-country-item-name"><%= @country.name %></span>
+      <span class="live_phone-country-item-code"><%= @country.region_code %></span>
+    </li>
+    """
   end
 end
