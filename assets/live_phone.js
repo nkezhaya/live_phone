@@ -88,13 +88,10 @@ class LivePhone {
   // This has to happen because the `phx-change` event was not
   // always called correctly when updating the value from the
   // back-end. So this sends a dummy change event to work around it.
-  setChange({value: phone}) {
-    const changeEvent = new Event('change', {bubbles: true})
-    const changed = this.elements.hiddenField().value !== phone
-    if (changed) {
-      this.elements.hiddenField().value = phone
-      this.elements.hiddenField().dispatchEvent(changeEvent)
-    }
+  setChange({ value: phone }) {
+    const changeEvent = new Event('change', { bubbles: true })
+    this.elements.hiddenField().value = phone
+    this.elements.hiddenField().dispatchEvent(changeEvent)
   }
 
   // This updates the mask
