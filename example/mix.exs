@@ -34,16 +34,14 @@ defmodule LivePhoneExample.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.6"},
-      {:phoenix_live_view, "~> 0.16"},
-      {:esbuild, "~> 0.2"},
-      {:floki, ">= 0.31.0", only: :test},
-      {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_poller, "~> 0.4"},
-      {:gettext, "~> 0.11"},
-      {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"},
+      {:phoenix_live_view, "~> 0.18"},
+      {:esbuild, "~> 0.5"},
+      {:floki, ">= 0.34.0", only: :test},
+      {:phoenix_html, "~> 3.2"},
+      {:phoenix_live_reload, "~> 1.4", only: :dev},
+      {:gettext, "~> 0.20"},
+      {:jason, "~> 1.4"},
+      {:plug_cowboy, "~> 2.6"},
       {:live_phone, path: "../"}
     ]
   end
