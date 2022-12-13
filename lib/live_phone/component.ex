@@ -53,10 +53,18 @@ defmodule LivePhone.Component do
     current_country =
       assigns[:country] || socket.assigns[:country] || hd(assigns[:preferred] || ["US"])
 
+    masks =
+      if assigns[:apply_format?] do
+        current_country
+        |> get_masks()
+        |> Enum.join(",")
+      end
+
     socket =
       socket
       |> assign(assigns)
       |> assign_country(current_country)
+      |> assign(:masks, masks)
 
     {:ok, socket |> set_value()}
   end
@@ -65,14 +73,29 @@ defmodule LivePhone.Component do
   def render(assigns) do
     ~H"""
     <div class={"live_phone #{if @is_valid?, do: " live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
-      <%= country_selector(assigns) %>
+      <.country_selector tabindex={@tabindex} target={@myself} is_opened?={@is_opened?} country={@country} />
 
-      <%= phone_input(assigns) %>
+      <input
+        type="tel"
+        class="live_phone-input"
+        value={assigns[:value]}
+        tabindex={assigns[:tabindex]}
+        placeholder={assigns[:placeholder] || get_placeholder(assigns[:country])}
+        data-masks={@masks}
+        phx-target={@myself}
+        phx-keyup="typing"
+        phx-blur="close"
+      >
 
-      <%= hidden_phone_input(assigns) %>
+      <%= hidden_input(
+        assigns[:form],
+        assigns[:field],
+        name: assigns[:name] || input_name(assigns[:form], assigns[:field]),
+        value: assigns[:formatted_value]
+      ) %>
 
       <%= if @is_opened? do %>
-        <%= country_list(assigns) %>
+        <.country_list country={@country} preferred={@preferred} id={@id} target={@myself} />
       <% end %>
     </div>
     """
@@ -223,71 +246,24 @@ defmodule LivePhone.Component do
   @spec assign_country(Phoenix.LiveView.Socket.t(), Country.t() | String.t()) ::
           Phoenix.LiveView.Socket.t()
   defp assign_country(socket, %Country{code: country}), do: assign_country(socket, country)
+  defp assign_country(socket, country), do: assign(socket, :country, country)
 
-  defp assign_country(socket, country) do
-    socket
-    |> assign(:country, country)
-  end
-
-  @spec phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
-  defp phone_input(assigns) do
-    masks =
-      if assigns.apply_format? do
-        assigns[:country]
-        |> get_masks()
-        |> Enum.join(",")
-      else
-        nil
+  defp country_selector(assigns) do
+    region_code =
+      ExPhoneNumber.Metadata.get_for_region_code(assigns[:country])
+      |> case do
+        nil -> ""
+        code -> "+#{code.country_code}"
       end
 
-    tag(:input,
-      type: "tel",
-      class: "live_phone-input",
-      value: assigns[:value],
-      tabindex: assigns[:tabindex],
-      placeholder: assigns[:placeholder] || get_placeholder(assigns[:country]),
-      data_masks: masks,
-      phx_target: assigns[:myself],
-      phx_keyup: "typing",
-      phx_blur: "close"
-    )
-  end
+    assigns = assign(assigns, :region_code, region_code)
 
-  @spec hidden_phone_input(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
-  defp hidden_phone_input(assigns) do
-    hidden_input(
-      assigns[:form],
-      assigns[:field],
-      name: assigns[:name] || input_name(assigns[:form], assigns[:field]),
-      value: assigns[:formatted_value]
-    )
-  end
-
-  @spec country_selector(Phoenix.LiveView.Socket.assigns()) :: Phoenix.HTML.Safe.t()
-  defp country_selector(assigns) do
-    content_tag(:div,
-      role: "combobox",
-      class: "live_phone-country",
-      tabindex: assigns[:tabindex],
-      phx_target: assigns[:myself],
-      phx_click: "toggle",
-      aria_owns: "live_phone-country-list-#{assigns[:id]}",
-      aria_expanded: if(assigns[:is_opened?], do: true, else: false)
-    ) do
-      emoji = LivePhone.emoji_for_country(assigns[:country])
-
-      region_code =
-        ExPhoneNumber.Metadata.get_for_region_code(assigns[:country])
-        |> case do
-          nil -> ""
-          code -> "+#{code.country_code}"
-        end
-
-      [
-        content_tag(:span, emoji, class: "live_phone-country-flag"),
-        content_tag(:span, region_code, class: "live_phone-country-code")
-      ]
-    end
+    ~H"""
+    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={@is_opened?} role="combobox">
+      <span class="live_phone-country-flag"><%= LivePhone.emoji_for_country(@country) %></span>
+      <span class="live_phone-country-code"><%= @region_code %></span>
+    </div>
+    """
   end
 
   defp country_list(assigns) do
@@ -311,7 +287,7 @@ defmodule LivePhone.Component do
     ~H"""
     <ul class="live_phone-country-list" id={"live_phone-country-list-#{@id}"} role="listbox">
       <%= for country <- @countries do %>
-        <.country_list_item country={country} current_country={@country} target={@myself} />
+        <.country_list_item country={country} current_country={@country} target={@target} />
 
         <%= if country == @last_preferred do %>
           <li role="separator" class="live_phone-country-separator" aria-disabled="true">
