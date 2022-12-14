@@ -127,24 +127,14 @@ defmodule LivePhone.Component do
       end || ""
 
     formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
+    value = apply_mask(value, socket.assigns[:country])
     is_valid? = LivePhone.is_valid?(formatted_value)
-
-    socket =
-      with true <- is_valid?,
-           {:ok, country} <- LivePhone.get_country(formatted_value) do
-        without_country_code = String.replace(formatted_value, "+#{country.region_code}", "")
-
-        socket
-        |> assign_country(country)
-        |> assign(:value, without_country_code)
-      else
-        _ -> socket |> assign(:value, value)
-      end
 
     push? = socket.assigns[:formatted_value] != formatted_value
 
     socket
     |> assign(:is_valid?, is_valid?)
+    |> assign(:value, value)
     |> assign(:formatted_value, formatted_value)
     |> then(fn socket ->
       if push? do
@@ -156,6 +146,27 @@ defmodule LivePhone.Component do
         socket
       end
     end)
+  end
+
+  defp apply_mask(value, _country) when value in [nil, ""], do: value
+
+  defp apply_mask(value, country) do
+    case ExPhoneNumber.parse(value, country) do
+      {:ok, phone_number} ->
+        metadata = ExPhoneNumber.Metadata.get_for_region_code(country)
+
+        national_significant_number =
+          ExPhoneNumber.Model.PhoneNumber.get_national_significant_number(phone_number)
+
+        ExPhoneNumber.Formatting.format_nsn(
+          national_significant_number,
+          metadata,
+          :international
+        )
+
+      _ ->
+        ""
+    end
   end
 
   @impl true
