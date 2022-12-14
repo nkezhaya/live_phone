@@ -185,15 +185,11 @@ defmodule LivePhone.Component do
   end
 
   def handle_event("toggle", _, socket) do
-    {:noreply,
-     socket
-     |> assign(:is_opened?, socket.assigns.is_opened? != true)}
+    {:noreply, assign(socket, :is_opened?, socket.assigns.is_opened? != true)}
   end
 
   def handle_event("close", _, socket) do
-    {:noreply,
-     socket
-     |> assign(:is_opened?, false)}
+    {:noreply, assign(socket, :is_opened?, false)}
   end
 
   @spec get_placeholder(String.t()) :: String.t()
