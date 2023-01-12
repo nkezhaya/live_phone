@@ -1,8 +1,9 @@
 defmodule LivePhone.Countries do
   @moduledoc """
-  The `LivePhone.Countries` module can be used to list all known countries and return
-  them ordered alphabetically, and optionally you can ensure your preferred countries
-  are prepended to the list instead of mixed in with the rest.
+  The `LivePhone.Countries` module can be used to list all known countries and
+  return them ordered alphabetically, and optionally you can ensure your
+  preferred countries are prepended to the list instead of mixed in with the
+  rest.
   """
 
   alias ISO
@@ -14,8 +15,8 @@ defmodule LivePhone.Countries do
   This function returns all known countries as `LivePhone.Country` structs,
   sorted alphabetically by country name.
 
-  Optionally you can specify a list of preferred country codes, these will
-  subsequently be prepended to the list.
+  Optionally you can specify a list of preferred country codes, and these will
+  be put at the top of the list.
 
   ```elixir
   # This will return everything alphabetically
@@ -32,10 +33,13 @@ defmodule LivePhone.Countries do
     preferred = preferred |> Enum.uniq() |> Enum.with_index()
 
     ISO.countries()
-    |> Enum.map(&Country.from_iso/1)
-    |> Enum.map(&set_preferred_flag(&1, preferred))
+    |> Enum.map(fn country ->
+      country
+      |> Country.from_iso()
+      |> set_preferred_flag(preferred)
+    end)
     |> Enum.filter(&(&1.region_code && &1.region_code != ""))
-    |> Enum.sort(&sort_by_name/2)
+    |> Enum.sort_by(& &1.name)
     |> Enum.sort_by(&sort_by_preferred(&1, preferred), :desc)
   end
 
@@ -87,11 +91,6 @@ defmodule LivePhone.Countries do
       nil -> country
       {_, _index} -> %{country | preferred: true}
     end
-  end
-
-  @spec sort_by_name(%{name: String.t()}, %{name: String.t()}) :: boolean()
-  defp sort_by_name(%{name: name_1}, %{name: name_2}) do
-    name_1 < name_2
   end
 
   @spec sort_by_preferred(Country.t(), list(String.t())) :: integer()
