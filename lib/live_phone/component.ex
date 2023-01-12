@@ -7,15 +7,13 @@ defmodule LivePhone.Component do
   `./example`/  directory of this repository, so feel free to check that out as well.
 
   ```elixir
-    live_component(
-      @socket,
-      LivePhone.Component,
-      id: "phone",
-      form: :user,
-      field: :phone,
-      tabindex: 0,
-      preferred: ["US", "CA"]
-    )
+  <.live_component
+    module={LivePhone.Component}
+    id="phone"
+    form={:user}
+    field={:phone}
+    tabindex={0}
+    preferred={["US", "CA"]} />
   ```
 
   This will result in a form field with the name `user[phone]`. You can specify
@@ -42,8 +40,8 @@ defmodule LivePhone.Component do
      |> assign_new(:tabindex, fn -> 0 end)
      |> assign_new(:apply_format?, fn -> false end)
      |> assign_new(:value, fn -> "" end)
-     |> assign(:is_opened?, false)
-     |> assign(:is_valid?, false)}
+     |> assign_new(:is_opened?, fn -> false end)
+     |> assign_new(:is_valid?, fn -> false end)}
   end
 
   @impl true
@@ -275,7 +273,7 @@ defmodule LivePhone.Component do
     assigns = assign(assigns, :region_code, region_code)
 
     ~H"""
-    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={@is_opened?} role="combobox">
+    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={to_string(@is_opened?)} role="combobox">
       <span class="live_phone-country-flag"><%= LivePhone.emoji_for_country(@country) %></span>
       <span class="live_phone-country-code"><%= @region_code %></span>
     </div>
@@ -306,7 +304,7 @@ defmodule LivePhone.Component do
         <.country_list_item country={country} current_country={@country} target={@target} />
 
         <%= if country == @last_preferred do %>
-          <li role="separator" class="live_phone-country-separator" aria-disabled="true">
+          <li aria-disabled="true" class="live_phone-country-separator" role="separator">
           </li>
         <% end %>
       <% end %>
@@ -325,10 +323,10 @@ defmodule LivePhone.Component do
     assigns = assign(assigns, :class, class)
 
     ~H"""
-    <li role="option" class={@class} aria-selected={@selected?} phx-target={@target} phx-click="select_country" phx-value-country={@country.code}>
+    <li aria-selected={to_string(@selected?)} class={@class} phx-click="select_country" phx-target={@target} phx-value-country={@country.code} role="option">
       <span class="live_phone-country-item-flag"><%= @country.flag_emoji %></span>
       <span class="live_phone-country-item-name"><%= @country.name %></span>
-      <span class="live_phone-country-item-code"><%= @country.region_code %></span>
+      <span class="live_phone-country-item-code">+<%= @country.region_code %></span>
     </li>
     """
   end

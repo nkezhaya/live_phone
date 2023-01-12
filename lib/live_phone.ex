@@ -91,7 +91,8 @@ defmodule LivePhone do
 
       iex> LivePhone.normalize!("1234", nil)
       "1234"
-
+      iex> LivePhone.normalize!("+1234", nil)
+      "+1234"
       iex> LivePhone.normalize!("+1 (650) 253-0000", "US")
       "+16502530000"
 
@@ -115,7 +116,8 @@ defmodule LivePhone do
 
       iex> LivePhone.normalize("1234", nil)
       {:error, "1234"}
-
+      iex> LivePhone.normalize("+1234", nil)
+      {:ok, "+1234"}
       iex> LivePhone.normalize("+1 (650) 253-0000", "US")
       {:ok, "+16502530000"}
 
@@ -123,7 +125,7 @@ defmodule LivePhone do
   @spec normalize(String.t(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def normalize(phone, country) do
     phone
-    |> String.replace(~r/[^\d]/, "")
+    |> String.replace(~r/[^+\d]/, "")
     |> ExPhoneNumber.parse(country)
     |> case do
       {:ok, result} ->

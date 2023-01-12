@@ -1,8 +1,6 @@
 defmodule LivePhone.ComponentTest do
-  import Phoenix.LiveViewTest
-  import Phoenix.ConnTest
-
   use ExUnit.Case
+  import Phoenix.{LiveViewTest, ConnTest}
   doctest LivePhone.Component
 
   @endpoint LivePhoneTestApp.Endpoint
@@ -12,36 +10,35 @@ defmodule LivePhone.ComponentTest do
   end
 
   test "renders component" do
-    component = render_component(LivePhone.Component, id: "livephone")
+    component = render_live_phone(id: "livephone")
     assert component =~ "id=\"live_phone-livephone\""
   end
 
   test "support setting tabindex" do
-    component = render_component(LivePhone.Component, id: "livephone", tabindex: 42)
+    component = render_live_phone(id: "livephone", tabindex: 42)
     assert component =~ "tabindex=\"42\""
   end
 
   test "support setting name" do
-    component = render_component(LivePhone.Component, id: "livephone", name: :phone)
+    component = render_live_phone(id: "livephone", name: :phone)
     assert component =~ "name=\"phone\""
   end
 
   test "support setting form and field" do
-    component = render_component(LivePhone.Component, id: "livephone", form: :user, field: :phone)
+    component = render_live_phone(id: "livephone", form: :user, field: :phone)
 
     assert component =~ "name=\"user[phone]\""
   end
 
   test "support setting placeholder" do
-    component =
-      render_component(LivePhone.Component, id: "livephone", placeholder: "Phone Number")
+    component = render_live_phone(id: "livephone", placeholder: "Phone Number")
 
     assert component =~ "placeholder=\"Phone Number\""
   end
 
   test "support setting mask (single)" do
     component =
-      render_component(LivePhone.Component,
+      render_live_phone(
         id: "livephone",
         apply_format?: true,
         placeholder: "Phone Number"
@@ -52,7 +49,7 @@ defmodule LivePhone.ComponentTest do
 
   test "support setting mask (multiple)" do
     component =
-      render_component(LivePhone.Component,
+      render_live_phone(
         id: "livephone",
         apply_format?: true,
         country: "SE",
@@ -69,7 +66,7 @@ defmodule LivePhone.ComponentTest do
     changeset = LivePhoneTestApp.User.changeset()
 
     form = form_for(changeset, "/")
-    component = render_component(LivePhone.Component, id: "livephone", form: form, field: :phone)
+    component = render_live_phone(id: "livephone", form: form, field: :phone)
 
     assert component =~ "name=\"user[phone]\""
     assert component =~ "value=\"\""
@@ -85,7 +82,7 @@ defmodule LivePhone.ComponentTest do
       )
 
     form = form_for(changeset, "/")
-    component = render_component(LivePhone.Component, id: "livephone", form: form, field: :phone)
+    component = render_live_phone(id: "livephone", form: form, field: :phone)
 
     assert component =~ "name=\"user[phone]\""
     assert component =~ "value=\"+16502530000\""
@@ -93,7 +90,7 @@ defmodule LivePhone.ComponentTest do
 
   test "support setting form, field and name (name wins)" do
     component =
-      render_component(LivePhone.Component,
+      render_live_phone(
         id: "livephone",
         name: :my_phone,
         form: :user,
@@ -103,16 +100,15 @@ defmodule LivePhone.ComponentTest do
     assert component =~ "name=\"my_phone\""
   end
 
-  test "supports setting value" do
-    component = render_component(LivePhone.Component, id: "livephone", value: "+1234")
+  test "supports setting partial value" do
+    component = render_live_phone(id: "livephone", value: "+1234")
     assert component =~ "value=\"+1234\""
   end
 
   test "supports setting preferred and is_opened?" do
-    component =
-      render_component(LivePhone.Component, id: "livephone", preferred: ["CA"], is_opened?: true)
+    component = render_live_phone(id: "livephone", preferred: ["CA"], is_opened?: true)
 
-    # NOTE: Seperator should follow preferred list
+    # NOTE: Separator should follow preferred list
     assert component =~
              [
                "<ul class=\"live_phone-country-list\" id=\"live_phone-country-list-livephone\" role=\"listbox\">",
@@ -127,8 +123,7 @@ defmodule LivePhone.ComponentTest do
   end
 
   test "supports setting country and is_opened?" do
-    component =
-      render_component(LivePhone.Component, id: "livephone", country: "CA", is_opened?: true)
+    component = render_live_phone(id: "livephone", country: "CA", is_opened?: true)
 
     # NOTE: Separator should NOT follow selected, because by default there are
     # still preferred to follow the selected before the separator is shown.
@@ -147,7 +142,7 @@ defmodule LivePhone.ComponentTest do
 
   test "supports setting country, preferred and is_opened?" do
     component =
-      render_component(LivePhone.Component,
+      render_live_phone(
         id: "livephone",
         country: "CA",
         preferred: ["GB"],
@@ -297,5 +292,11 @@ defmodule LivePhone.ComponentTest do
   # it just increments a test counter assign that is not used anywhere else.
   defp trigger_update(view) do
     view |> element("#test_incr") |> render_click()
+  end
+
+  defp render_live_phone(assigns) do
+    LivePhone.Component
+    |> render_component(assigns)
+    |> String.replace(~r/>([\s\n]+)</, "><", global: true)
   end
 end
