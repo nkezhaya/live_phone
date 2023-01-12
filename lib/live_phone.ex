@@ -36,10 +36,8 @@ defmodule LivePhone do
   """
   @spec valid?(String.t()) :: boolean()
   def valid?(phone) do
-    with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
-         true <- ExPhoneNumber.is_valid_number?(parsed_phone) do
-      true
-    else
+    case ExPhoneNumber.parse(phone, nil) do
+      {:ok, parsed_phone} -> ExPhoneNumber.is_valid_number?(parsed_phone)
       _ -> false
     end
   end
