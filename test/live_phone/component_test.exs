@@ -105,8 +105,8 @@ defmodule LivePhone.ComponentTest do
     assert component =~ "value=\"+1234\""
   end
 
-  test "supports setting preferred and is_opened?" do
-    component = render_live_phone(id: "livephone", preferred: ["CA"], is_opened?: true)
+  test "supports setting preferred and opened?" do
+    component = render_live_phone(id: "livephone", preferred: ["CA"], opened?: true)
 
     # NOTE: Separator should follow preferred list
     assert component =~
@@ -122,8 +122,8 @@ defmodule LivePhone.ComponentTest do
              |> Enum.join()
   end
 
-  test "supports setting country and is_opened?" do
-    component = render_live_phone(id: "livephone", country: "CA", is_opened?: true)
+  test "supports setting country and opened?" do
+    component = render_live_phone(id: "livephone", country: "CA", opened?: true)
 
     # NOTE: Separator should NOT follow selected, because by default there are
     # still preferred to follow the selected before the separator is shown.
@@ -140,13 +140,13 @@ defmodule LivePhone.ComponentTest do
              |> Enum.join()
   end
 
-  test "supports setting country, preferred and is_opened?" do
+  test "supports setting country, preferred and opened?" do
     component =
       render_live_phone(
         id: "livephone",
         country: "CA",
         preferred: ["GB"],
-        is_opened?: true
+        opened?: true
       )
 
     # NOTE: Separator should NOT follow selected, because by default there are

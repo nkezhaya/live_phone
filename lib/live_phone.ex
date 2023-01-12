@@ -12,30 +12,30 @@ defmodule LivePhone do
 
   ## Examples
 
-      iex> LivePhone.is_valid?("")
+      iex> LivePhone.valid?("")
       false
 
-      iex> LivePhone.is_valid?("+1555")
+      iex> LivePhone.valid?("+1555")
       false
 
-      iex> LivePhone.is_valid?("+1555")
+      iex> LivePhone.valid?("+1555")
       false
 
-      iex> LivePhone.is_valid?("+1 (555) 555-1234")
+      iex> LivePhone.valid?("+1 (555) 555-1234")
       false
 
-      iex> LivePhone.is_valid?("+1 (555) 555-1234")
+      iex> LivePhone.valid?("+1 (555) 555-1234")
       false
 
-      iex> LivePhone.is_valid?("+1 (650) 253-0000")
+      iex> LivePhone.valid?("+1 (650) 253-0000")
       true
 
-      iex> LivePhone.is_valid?("+16502530000")
+      iex> LivePhone.valid?("+16502530000")
       true
 
   """
-  @spec is_valid?(String.t()) :: boolean()
-  def is_valid?(phone) do
+  @spec valid?(String.t()) :: boolean()
+  def valid?(phone) do
     with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
          true <- ExPhoneNumber.is_valid_number?(parsed_phone) do
       true

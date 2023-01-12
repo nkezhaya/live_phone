@@ -3,11 +3,12 @@ defmodule LivePhoneExampleWeb.PageLive do
 
   alias LivePhoneExample.PhoneStorage
 
-  @data %{phone: :string}
+  @data %{phone: :string, phone2: :string}
 
   @impl true
   def mount(_params, _session, socket) do
-    phone = PhoneStorage.get_phone()
+    # phone = PhoneStorage.get_phone()
+    phone = "+1234"
     changeset = Ecto.Changeset.change({%{phone: phone}, @data})
 
     {:ok,

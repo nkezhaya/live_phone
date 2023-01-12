@@ -40,8 +40,8 @@ defmodule LivePhone.Component do
      |> assign_new(:tabindex, fn -> 0 end)
      |> assign_new(:apply_format?, fn -> false end)
      |> assign_new(:value, fn -> "" end)
-     |> assign_new(:is_opened?, fn -> false end)
-     |> assign_new(:is_valid?, fn -> false end)}
+     |> assign_new(:opened?, fn -> false end)
+     |> assign_new(:valid?, fn -> false end)}
   end
 
   @impl true
@@ -70,8 +70,8 @@ defmodule LivePhone.Component do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class={"live_phone #{if @is_valid?, do: " live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
-      <.country_selector tabindex={@tabindex} target={@myself} is_opened?={@is_opened?} country={@country} />
+    <div class={"live_phone #{if @valid?, do: " live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
+      <.country_selector tabindex={@tabindex} target={@myself} opened?={@opened?} country={@country} />
 
       <input
         type="tel"
@@ -92,7 +92,7 @@ defmodule LivePhone.Component do
         value: assigns[:formatted_value]
       ) %>
 
-      <%= if @is_opened? do %>
+      <%= if @opened? do %>
         <.country_list country={@country} preferred={@preferred} id={@id} target={@myself} />
       <% end %>
     </div>
@@ -126,12 +126,12 @@ defmodule LivePhone.Component do
 
     formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
     value = apply_mask(value, socket.assigns[:country])
-    is_valid? = LivePhone.is_valid?(formatted_value)
+    valid? = LivePhone.valid?(formatted_value)
 
     push? = socket.assigns[:formatted_value] != formatted_value
 
     socket
-    |> assign(:is_valid?, is_valid?)
+    |> assign(:valid?, valid?)
     |> assign(:value, value)
     |> assign(:formatted_value, formatted_value)
     |> then(fn socket ->
@@ -175,7 +175,7 @@ defmodule LivePhone.Component do
   end
 
   def handle_event("select_country", %{"country" => country}, socket) do
-    is_valid? = LivePhone.is_valid?(socket.assigns[:formatted_value])
+    valid? = LivePhone.valid?(socket.assigns[:formatted_value])
 
     placeholder =
       if socket.assigns[:country] == country do
@@ -187,18 +187,18 @@ defmodule LivePhone.Component do
     {:noreply,
      socket
      |> assign_country(country)
-     |> assign(:is_valid?, is_valid?)
-     |> assign(:is_opened?, false)
+     |> assign(:valid?, valid?)
+     |> assign(:opened?, false)
      |> assign(:placeholder, placeholder)
      |> push_event("focus", %{id: "live_phone-#{socket.assigns.id}"})}
   end
 
   def handle_event("toggle", _, socket) do
-    {:noreply, assign(socket, :is_opened?, socket.assigns.is_opened? != true)}
+    {:noreply, assign(socket, :opened?, socket.assigns.opened? != true)}
   end
 
   def handle_event("close", _, socket) do
-    {:noreply, assign(socket, :is_opened?, false)}
+    {:noreply, assign(socket, :opened?, false)}
   end
 
   @spec get_placeholder(String.t()) :: String.t()
@@ -273,7 +273,7 @@ defmodule LivePhone.Component do
     assigns = assign(assigns, :region_code, region_code)
 
     ~H"""
-    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={to_string(@is_opened?)} role="combobox">
+    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={to_string(@opened?)} role="combobox">
       <span class="live_phone-country-flag"><%= LivePhone.emoji_for_country(@country) %></span>
       <span class="live_phone-country-code"><%= @region_code %></span>
     </div>
