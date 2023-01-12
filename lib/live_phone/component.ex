@@ -124,7 +124,7 @@ defmodule LivePhone.Component do
           found_value
       end || ""
 
-    formatted_value = LivePhone.normalize!(value, socket.assigns[:country])
+    {_, formatted_value} = LivePhone.normalize(value, socket.assigns[:country])
     value = apply_mask(value, socket.assigns[:country])
     valid? = LivePhone.valid?(formatted_value)
 

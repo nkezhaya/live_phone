@@ -83,30 +83,6 @@ defmodule LivePhone do
 
   @doc ~S"""
   This is used to normalize a given `phone` number to E.164 format,
-  and immediately return the value whether it is formatted or not.
-
-  ## Examples
-
-      iex> LivePhone.normalize!("1234", nil)
-      "1234"
-      iex> LivePhone.normalize!("+1234", nil)
-      "+1234"
-      iex> LivePhone.normalize!("+1 (650) 253-0000", "US")
-      "+16502530000"
-
-  """
-  @spec normalize!(String.t(), String.t()) :: String.t()
-  def normalize!(phone, country) do
-    phone
-    |> normalize(country)
-    |> case do
-      {:ok, formatted} -> formatted
-      {:error, unformatted} -> unformatted
-    end
-  end
-
-  @doc ~S"""
-  This is used to normalize a given `phone` number to E.164 format,
   and returns a tuple with `{:ok, formatted_phone}` for valid numbers
   and `{:error, unformatted_phone}` for invalid numbers.
 
