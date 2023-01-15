@@ -23,16 +23,14 @@ defmodule LivePhone.Component do
 
   With `preferred` you can set a list of countries that you believe should be
   on top always. The currently selected country will also be on top automatically.
-
   """
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  alias LivePhone.Countries
+  alias Phoenix.LiveView.Socket
   alias LivePhone.Country
 
   @impl true
-  @spec mount(Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(socket) do
     {:ok,
      socket
@@ -45,8 +43,6 @@ defmodule LivePhone.Component do
   end
 
   @impl true
-  @spec update(Phoenix.LiveView.Socket.assigns(), Phoenix.LiveView.Socket.t()) ::
-          {:ok, Phoenix.LiveView.Socket.t()}
   def update(assigns, socket) do
     current_country =
       assigns[:country] || socket.assigns[:country] || hd(assigns[:preferred] || ["US"])
@@ -64,14 +60,14 @@ defmodule LivePhone.Component do
       |> assign_country(current_country)
       |> assign(:masks, masks)
 
-    {:ok, set_value(socket)}
+    {:ok, set_value(socket, socket.assigns.value)}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <div class={"live_phone #{if @valid?, do: " live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
-      <.country_selector tabindex={@tabindex} target={@myself} opened?={@opened?} country={@country} />
+    <div class={"live_phone #{if @valid?, do: "live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
+      <.country_selector tabindex={@tabindex} target={@myself} opened?={@opened?} country={@country} wrapper={"live_phone-#{@id}"} />
 
       <input
         type="tel"
@@ -99,16 +95,13 @@ defmodule LivePhone.Component do
     """
   end
 
-  @spec set_value(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
-  def set_value(socket) do
-    set_value(socket, socket.assigns[:value])
-  end
+  defguardp is_empty(value) when is_nil(value) or value == ""
 
-  @spec set_value(Phoenix.LiveView.Socket.t(), String.t()) :: Phoenix.LiveView.Socket.t()
+  @spec set_value(Socket.t(), String.t()) :: Socket.t()
   def set_value(socket, value) do
     value =
       case value do
-        empty when empty in ["", nil] ->
+        empty when is_empty(empty) ->
           case socket.assigns do
             %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
               input_value(form, field)
@@ -146,7 +139,7 @@ defmodule LivePhone.Component do
     end)
   end
 
-  defp apply_mask(value, _country) when value in [nil, ""], do: value
+  defp apply_mask(value, _country) when is_empty(value), do: value
 
   defp apply_mask(value, country) do
     case ExPhoneNumber.parse(value, country) do
@@ -156,11 +149,7 @@ defmodule LivePhone.Component do
         national_significant_number =
           ExPhoneNumber.Model.PhoneNumber.get_national_significant_number(phone_number)
 
-        ExPhoneNumber.Formatting.format_nsn(
-          national_significant_number,
-          metadata,
-          :international
-        )
+        ExPhoneNumber.Formatting.format_nsn(national_significant_number, metadata, :international)
 
       _ ->
         ""
@@ -168,8 +157,6 @@ defmodule LivePhone.Component do
   end
 
   @impl true
-  @spec handle_event(String.t(), map(), Phoenix.LiveView.Socket.t()) ::
-          {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("typing", %{"value" => value}, socket) do
     {:noreply, set_value(socket, value)}
   end
@@ -257,15 +244,13 @@ defmodule LivePhone.Component do
     |> Enum.uniq()
   end
 
-  @spec assign_country(Phoenix.LiveView.Socket.t(), Country.t() | String.t()) ::
-          Phoenix.LiveView.Socket.t()
+  @spec assign_country(Socket.t(), Country.t() | String.t()) :: Socket.t()
   defp assign_country(socket, %Country{code: country}), do: assign_country(socket, country)
   defp assign_country(socket, country), do: assign(socket, :country, country)
 
   defp country_selector(assigns) do
     region_code =
-      ExPhoneNumber.Metadata.get_for_region_code(assigns[:country])
-      |> case do
+      case ExPhoneNumber.Metadata.get_for_region_code(assigns[:country]) do
         nil -> ""
         code -> "+#{code.country_code}"
       end
@@ -273,7 +258,7 @@ defmodule LivePhone.Component do
     assigns = assign(assigns, :region_code, region_code)
 
     ~H"""
-    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns="live_phone-country-list-#{@id}" aria-expanded={to_string(@opened?)} role="combobox">
+    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns={@wrapper} aria-expanded={to_string(@opened?)} role="combobox">
       <span class="live_phone-country-flag"><%= LivePhone.emoji_for_country(@country) %></span>
       <span class="live_phone-country-code"><%= @region_code %></span>
     </div>
@@ -288,8 +273,7 @@ defmodule LivePhone.Component do
         assigns
       end
 
-    assigns =
-      assign_new(assigns, :countries, fn -> Countries.list_countries(assigns[:preferred]) end)
+    assigns = assign_new(assigns, :countries, fn -> Country.list(assigns[:preferred]) end)
 
     assigns =
       assign_new(assigns, :last_preferred, fn ->

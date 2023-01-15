@@ -4,7 +4,7 @@ defmodule LivePhone do
   #{File.read!(@external_resource)}
   """
 
-  alias LivePhone.Countries
+  alias LivePhone.Country
 
   @doc ~S"""
   This is used to verify a given phone number and see if it is a valid number
@@ -69,12 +69,11 @@ defmodule LivePhone do
       {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
 
   """
-  @spec get_country(String.t()) ::
-          {:ok, Countries.Country.t()} | {:error, :invalid_number}
+  @spec get_country(String.t()) :: {:ok, Country.t()} | {:error, :invalid_number}
   def get_country(phone) do
     with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
          true <- ExPhoneNumber.is_valid_number?(parsed_phone),
-         {:ok, country} <- Countries.lookup(parsed_phone) do
+         {:ok, country} <- Country.get(parsed_phone) do
       {:ok, country}
     else
       _ -> {:error, :invalid_number}
