@@ -48,19 +48,21 @@ defmodule LivePhoneTestApp do
         <script type="text/javascript" src="/js/live_phone.js">
         </script>
         <script type="text/javascript">
-          let phx = Phoenix
-          let phxLV = LiveView
-          let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-          var liveSocket = new LiveView.LiveSocket(
-            "/live",
-            Phoenix.Socket, {
-              hooks: {
-                LivePhone: module.exports
-              },
-              params: {_csrf_token: csrfToken}
-            }
-          )
-          liveSocket.connect()
+          (function () {
+            var phx = Phoenix;
+            var phxLV = LiveView;
+            var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            var liveSocket = new LiveView.LiveSocket(
+              "/live",
+              Phoenix.Socket, {
+                hooks: {
+                  LivePhone: module.exports
+                },
+                params: {_csrf_token: csrfToken}
+              }
+            );
+            liveSocket.connect();
+          })();
         </script>
       </body>
       """
@@ -70,14 +72,6 @@ defmodule LivePhoneTestApp do
     def handle_event("incr", _params, socket) do
       current = (socket.assigns[:test_counter] || 0) + 1
       {:noreply, assign(socket, test_counter: current)}
-    end
-  end
-
-  defmodule ErrorView do
-    use Phoenix.View, root: ".", namespace: LivePhoneTestApp
-
-    def template_not_found(template, _assigns) do
-      Phoenix.Controller.status_message_from_template(template)
     end
   end
 
