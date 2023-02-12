@@ -4,133 +4,294 @@ defmodule LivePhone do
   #{File.read!(@external_resource)}
   """
 
-  alias LivePhone.Country
+  use Phoenix.LiveComponent
+  use Phoenix.HTML
 
-  @doc ~S"""
-  This is used to verify a given phone number and see if it is a valid number
-  according to ExPhoneNumber.
+  alias Phoenix.LiveView.Socket
+  alias LivePhone.{Country, Util}
 
-  ## Examples
+  @impl true
+  def mount(socket) do
+    {:ok,
+     socket
+     |> assign_new(:preferred, fn -> ["US", "GB"] end)
+     |> assign_new(:tabindex, fn -> 0 end)
+     |> assign_new(:apply_format?, fn -> false end)
+     |> assign_new(:value, fn -> "" end)
+     |> assign_new(:opened?, fn -> false end)
+     |> assign_new(:valid?, fn -> false end)}
+  end
 
-      iex> LivePhone.valid?("")
-      false
+  @impl true
+  def update(assigns, socket) do
+    current_country =
+      assigns[:country] || socket.assigns[:country] || hd(assigns[:preferred] || ["US"])
 
-      iex> LivePhone.valid?("+1555")
-      false
+    masks =
+      if assigns[:apply_format?] do
+        current_country
+        |> get_masks()
+        |> Enum.join(",")
+      end
 
-      iex> LivePhone.valid?("+1555")
-      false
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign_country(current_country)
+      |> assign(:masks, masks)
 
-      iex> LivePhone.valid?("+1 (555) 555-1234")
-      false
+    {:ok, set_value(socket, socket.assigns.value)}
+  end
 
-      iex> LivePhone.valid?("+1 (555) 555-1234")
-      false
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class={"live_phone #{if @valid?, do: "live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
+      <.country_selector tabindex={@tabindex} target={@myself} opened?={@opened?} country={@country} wrapper={"live_phone-#{@id}"} />
 
-      iex> LivePhone.valid?("+1 (650) 253-0000")
-      true
+      <input
+        type="tel"
+        class="live_phone-input"
+        value={assigns[:value]}
+        tabindex={assigns[:tabindex]}
+        placeholder={assigns[:placeholder] || get_placeholder(assigns[:country])}
+        data-masks={@masks}
+        phx-target={@myself}
+        phx-keyup="typing"
+        phx-blur="close"
+      >
 
-      iex> LivePhone.valid?("+16502530000")
-      true
+      <%= hidden_input(
+        assigns[:form],
+        assigns[:field],
+        name: assigns[:name] || input_name(assigns[:form], assigns[:field]),
+        value: assigns[:formatted_value]
+      ) %>
 
-  """
-  @spec valid?(String.t()) :: boolean()
-  def valid?(phone) do
-    case ExPhoneNumber.parse(phone, nil) do
-      {:ok, parsed_phone} -> ExPhoneNumber.is_valid_number?(parsed_phone)
-      _ -> false
+      <%= if @opened? do %>
+        <.country_list country={@country} preferred={@preferred} id={@id} target={@myself} />
+      <% end %>
+    </div>
+    """
+  end
+
+  defguardp is_empty(value) when is_nil(value) or value == ""
+
+  @spec set_value(Socket.t(), String.t()) :: Socket.t()
+  def set_value(socket, value) do
+    value =
+      case value do
+        empty when is_empty(empty) ->
+          case socket.assigns do
+            %{form: form, field: field} when not is_nil(form) and not is_nil(field) ->
+              input_value(form, field)
+
+            %{value: assigns_value} when not is_nil(assigns_value) ->
+              value
+
+            _ ->
+              value
+          end
+
+        found_value ->
+          found_value
+      end || ""
+
+    {_, formatted_value} = Util.normalize(value, socket.assigns[:country])
+    value = apply_mask(value, socket.assigns[:country])
+    valid? = Util.valid?(formatted_value)
+
+    push? = socket.assigns[:formatted_value] != formatted_value
+
+    socket
+    |> assign(:valid?, valid?)
+    |> assign(:value, value)
+    |> assign(:formatted_value, formatted_value)
+    |> then(fn socket ->
+      if push? do
+        push_event(socket, "change", %{
+          id: "live_phone-#{socket.assigns.id}",
+          value: formatted_value
+        })
+      else
+        socket
+      end
+    end)
+  end
+
+  defp apply_mask(value, _country) when is_empty(value), do: value
+
+  defp apply_mask(value, country) do
+    case ExPhoneNumber.parse(value, country) do
+      {:ok, phone_number} ->
+        metadata = ExPhoneNumber.Metadata.get_for_region_code(country)
+
+        national_significant_number =
+          ExPhoneNumber.Model.PhoneNumber.get_national_significant_number(phone_number)
+
+        ExPhoneNumber.Formatting.format_nsn(national_significant_number, metadata, :international)
+
+      _ ->
+        ""
     end
   end
 
-  @doc ~S"""
-  This is used to try and get a `Country` for a given phone number.
-
-  ## Examples
-
-      iex> LivePhone.get_country("")
-      {:error, :invalid_number}
-
-      iex> LivePhone.get_country("+1555")
-      {:error, :invalid_number}
-
-      iex> LivePhone.get_country("+1555")
-      {:error, :invalid_number}
-
-      iex> LivePhone.get_country("+1 (555) 555-1234")
-      {:error, :invalid_number}
-
-      iex> LivePhone.get_country("+1 (555) 555-1234")
-      {:error, :invalid_number}
-
-      iex> LivePhone.get_country("+1 (650) 253-0000")
-      {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
-
-      iex> LivePhone.get_country("+16502530000")
-      {:ok, %LivePhone.Country{code: "US", flag_emoji: "🇺🇸", name: "United States of America (the)", preferred: false, region_code: "1"}}
-
-  """
-  @spec get_country(String.t()) :: {:ok, Country.t()} | {:error, :invalid_number}
-  def get_country(phone) do
-    with {:ok, parsed_phone} <- ExPhoneNumber.parse(phone, nil),
-         true <- ExPhoneNumber.is_valid_number?(parsed_phone),
-         {:ok, country} <- Country.get(parsed_phone) do
-      {:ok, country}
-    else
-      _ -> {:error, :invalid_number}
-    end
+  @impl true
+  def handle_event("typing", %{"value" => value}, socket) do
+    {:noreply, set_value(socket, value)}
   end
 
-  @doc ~S"""
-  This is used to normalize a given `phone` number to E.164 format, and returns
-  a tuple with `{:ok, formatted_phone}` for valid numbers and `{:error,
-  unformatted_phone}` for invalid numbers.
+  def handle_event("select_country", %{"country" => country}, socket) do
+    valid? = Util.valid?(socket.assigns[:formatted_value])
 
-  ## Examples
+    placeholder =
+      if socket.assigns[:country] == country do
+        socket.assigns[:placeholder]
+      else
+        get_placeholder(country)
+      end
 
-      iex> LivePhone.normalize("1234", nil)
-      {:error, "1234"}
+    {:noreply,
+     socket
+     |> assign_country(country)
+     |> assign(:valid?, valid?)
+     |> assign(:opened?, false)
+     |> assign(:placeholder, placeholder)
+     |> push_event("focus", %{id: "live_phone-#{socket.assigns.id}"})}
+  end
 
-      iex> LivePhone.normalize("+1234", nil)
-      {:ok, "+1234"}
+  def handle_event("toggle", _, socket) do
+    {:noreply, assign(socket, :opened?, socket.assigns.opened? != true)}
+  end
 
-      iex> LivePhone.normalize("+1 (650) 253-0000", "US")
-      {:ok, "+16502530000"}
+  def handle_event("close", _, socket) do
+    {:noreply, assign(socket, :opened?, false)}
+  end
 
-  """
-  @spec normalize(String.t(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
-  def normalize(phone, country) do
-    phone
-    |> String.replace(~r/[^+\d]/, "")
-    |> ExPhoneNumber.parse(country)
+  @spec get_placeholder(String.t()) :: String.t()
+  defp get_placeholder(country) do
+    country
+    |> ExPhoneNumber.Metadata.get_for_region_code()
     |> case do
-      {:ok, result} -> {:ok, ExPhoneNumber.format(result, :e164)}
-      _ -> {:error, phone}
+      %{country_code: country_code, fixed_line: %{example_number: number}} ->
+        number
+        |> String.replace(~r/\d/, "5")
+        |> ExPhoneNumber.parse(country)
+        |> case do
+          {:ok, result} ->
+            result
+            |> ExPhoneNumber.format(:international)
+            |> String.replace(~r/^(\+|00)#{country_code}/, "")
+            |> String.trim()
+
+          _ ->
+            ""
+        end
     end
   end
 
-  @doc ~S"""
-  Parses the given `country_code` into an emoji, but I should note that the
-  emoji is not validated so it might return an invalid emoji (this will also
-  depend on the unicode version supported by your operating system, and which
-  flags are included.)
+  @spec get_masks(String.t()) :: [String.t()]
+  defp get_masks(country) do
+    metadata = ExPhoneNumber.Metadata.get_for_region_code(country)
 
-  ## Examples
+    # Iterate through all metadata to find phone number descriptions
+    # with example numbers only, and return those example numbers
+    metadata
+    |> Map.from_struct()
+    |> Enum.map(fn
+      {_, %ExPhoneNumber.Metadata.PhoneNumberDescription{} = desc} -> desc.example_number
+      _other -> nil
+    end)
+    |> Enum.filter(& &1)
 
-      iex> LivePhone.emoji_for_country(nil)
-      ""
+    # Parse all example numbers with the country and only keep valid ones
+    |> Enum.map(&ExPhoneNumber.parse(&1, country))
+    |> Enum.map(fn
+      {:ok, parsed} -> parsed
+      _other -> nil
+    end)
+    |> Enum.filter(& &1)
 
-      iex> LivePhone.emoji_for_country("US")
-      "🇺🇸"
+    # Format all parsed numbers with the international format
+    # but removing the leading country_code. Transform all digits to X
+    # to be used for a mask
+    |> Enum.map(&ExPhoneNumber.format(&1, :international))
+    |> Enum.map(&String.replace(&1, ~r/^(\+|00)#{metadata.country_code}/, ""))
+    |> Enum.map(&String.replace(&1, ~r/\d/, "X"))
+    |> Enum.map(&String.trim/1)
 
-  """
-  @spec emoji_for_country(String.t() | nil) :: String.t()
-  def emoji_for_country(nil), do: ""
+    # And make sure we only have unique ones
+    |> Enum.uniq()
+  end
 
-  def emoji_for_country(country_code) do
-    country_code
-    |> String.upcase()
-    |> String.to_charlist()
-    |> Enum.map(&(&1 - 65 + 127_462))
-    |> List.to_string()
+  @spec assign_country(Socket.t(), Country.t() | String.t()) :: Socket.t()
+  defp assign_country(socket, %Country{code: country}), do: assign_country(socket, country)
+  defp assign_country(socket, country), do: assign(socket, :country, country)
+
+  defp country_selector(assigns) do
+    region_code =
+      case ExPhoneNumber.Metadata.get_for_region_code(assigns[:country]) do
+        nil -> ""
+        code -> "+#{code.country_code}"
+      end
+
+    assigns = assign(assigns, :region_code, region_code)
+
+    ~H"""
+    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns={@wrapper} aria-expanded={to_string(@opened?)} role="combobox">
+      <span class="live_phone-country-flag"><%= Util.emoji_for_country(@country) %></span>
+      <span class="live_phone-country-code"><%= @region_code %></span>
+    </div>
+    """
+  end
+
+  defp country_list(assigns) do
+    assigns =
+      if assigns[:country] do
+        assign(assigns, :preferred, [assigns[:country] | assigns[:preferred]])
+      else
+        assigns
+      end
+
+    assigns = assign_new(assigns, :countries, fn -> Country.list(assigns[:preferred]) end)
+
+    assigns =
+      assign_new(assigns, :last_preferred, fn ->
+        assigns[:countries]
+        |> Enum.filter(& &1.preferred)
+        |> List.last()
+      end)
+
+    ~H"""
+    <ul class="live_phone-country-list" id={"live_phone-country-list-#{@id}"} role="listbox">
+      <%= for country <- @countries do %>
+        <.country_list_item country={country} current_country={@country} target={@target} />
+
+        <%= if country == @last_preferred do %>
+          <li aria-disabled="true" class="live_phone-country-separator" role="separator">
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+    """
+  end
+
+  defp country_list_item(assigns) do
+    selected? = assigns[:country].code == assigns[:current_country]
+    assigns = assign(assigns, :selected?, selected?)
+
+    class = ["live_phone-country-item"]
+    class = if assigns[:selected?], do: ["selected" | class], else: class
+    class = if assigns[:country].preferred, do: ["preferred" | class], else: class
+
+    assigns = assign(assigns, :class, class)
+
+    ~H"""
+    <li aria-selected={to_string(@selected?)} class={@class} phx-click="select_country" phx-target={@target} phx-value-country={@country.code} role="option">
+      <span class="live_phone-country-item-flag"><%= @country.flag_emoji %></span>
+      <span class="live_phone-country-item-name"><%= @country.name %></span>
+      <span class="live_phone-country-item-code">+<%= @country.region_code %></span>
+    </li>
+    """
   end
 end

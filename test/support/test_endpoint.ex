@@ -12,8 +12,6 @@ defmodule LivePhoneTestApp do
   end
 
   defmodule Page do
-    import Phoenix.LiveView.Helpers
-
     use Phoenix.HTML
     use Phoenix.LiveView
 
@@ -28,17 +26,16 @@ defmodule LivePhoneTestApp do
       <body>
         <%= csrf_meta_tag() %>
 
-        <%= live_component(
-          assigns[:socket],
-          LivePhone.Component,
-          id: "phone",
-          form: :user,
-          field: :phone,
-          apply_format?: assigns[:format?],
-          placeholder: "Phone",
-          preferred: ["US", "GB", "CA"],
-          test_counter: assigns[:test_counter]
-        ) %>
+        <.live_component
+          module={LivePhone}
+          id="phone"
+          form={:user}
+          field={:phone}
+          apply_format?={assigns[:format?]}
+          placeholder="Phone"
+          preferred={["US", "GB", "CA"]}
+          test_counter={assigns[:test_counter]}
+        />
 
         <button id="test_incr" phx-click="incr" />
         <script type="text/javascript" src="/js/phoenix.js"></script>

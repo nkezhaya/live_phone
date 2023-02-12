@@ -7,8 +7,7 @@ defmodule LivePhoneExampleWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    # phone = PhoneStorage.get_phone()
-    phone = "+1234"
+    phone = PhoneStorage.get_phone()
     changeset = Ecto.Changeset.change({%{phone: phone}, @data})
 
     {:ok,
@@ -24,7 +23,7 @@ defmodule LivePhoneExampleWeb.PageLive do
      socket
      |> assign(:phone_number, phone)
      |> assign(:changeset, Ecto.Changeset.change({params, @data}))
-     |> assign(:valid?, LivePhone.is_valid?(phone))}
+     |> assign(:valid?, LivePhone.Util.valid?(phone))}
   end
 
   def handle_event("submit", %{"phone" => %{"phone" => phone}}, socket) do

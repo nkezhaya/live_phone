@@ -2,8 +2,8 @@
   <h1>LivePhone Demo</h1>
 
   <.form :let={f} for={@changeset} as={:phone} phx-change="change" phx-submit="submit">
-    <.live_component module={LivePhone.Component} id="phone" form={f} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone1" />
-    <.live_component module={LivePhone.Component} id="phone2" form={f} field={:phone2} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone2" />
+    <.live_component module={LivePhone} id="phone" form={f} field={:phone} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone1" />
+    <.live_component module={LivePhone} id="phone2" form={f} field={:phone2} apply_format?={true} preferred={["US", "GB", "CA"]} placeholder="Phone2" />
 
     <button type="submit" class="mt-2">Submit</button>
   </.form>

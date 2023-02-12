@@ -63,7 +63,7 @@ class LivePhone {
     this.context.pushEventTo('#' + this.context.el.id, eventName, properties)
   }
 
-  // Is the target element contained within our LiveView Component?
+  // Is the target element contained within our LiveView component?
   contains(target) {
     return this.elements.parent().contains(target)
   }
@@ -149,7 +149,7 @@ class LivePhone {
     this.format()
   }
 
-  // When the LiveView Component gets updated it will execute this callback
+  // When the LiveView component gets updated it will execute this callback
   onUpdate() {
     // Update the masks (if there were previous masks set)
     let newMasks = this.elements.textField().dataset.masks
@@ -252,7 +252,7 @@ class LivePhone {
   }
 
   findPartialMatch(e) {
-    // Ignore events that happen outside of our LiveView Component
+    // Ignore events that happen outside of our LiveView component
     if (!this.contains(e.target)) return
 
     // We don't want to partial match on the input field value

@@ -1,4 +1,4 @@
-defmodule LivePhone.Component.JavascriptTest do
+defmodule LivePhone.BrowserTest do
   use ExUnit.Case
   use Hound.Helpers
 

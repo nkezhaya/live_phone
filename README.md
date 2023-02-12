@@ -3,10 +3,9 @@
 
 # LivePhone
 
-A Phoenix LiveView Component for phone number input fields, basically a [`intl-tel-input` ](https://github.com/jackocnr/intl-tel-input) for Phoenix LiveView.
+A Phoenix LiveComponent for phone number input fields, inspired by [`intl-tel-input`](https://github.com/jackocnr/intl-tel-input).
 
 Based on [`ISO`](https://github.com/whitepaperclip/iso) and [`ex_phone_number`](https://github.com/socialpaymentsbv/ex_phone_number), which in turn is based on [libphonenumber](https://github.com/google/libphonenumber).
-
 
 ## Installation
 
@@ -42,12 +41,30 @@ And finally to your CSS add:
 @import "../../deps/live_phone/assets/live_phone";
 ```
 
+## Usage
+
+Usage is pretty simple, and there is an example Phoenix project included in the `./example` directory of this repository.
+
+```elixir
+<.live_component
+  module={LivePhone}
+  id="phone"
+  form={:user}
+  field={:phone}
+  tabindex={0}
+  preferred={["US", "CA"]} />
+```
+
+This will result in a form field with the name `user[phone]`. You can specify just the `name` manually if desired, but when you add the `form` option the name will be generated via `Phoenix.HTML.Form.input_name/2`. So this should behave like a regular input field.
+
+With `preferred` you can set a list of countries that you believe should be on top always. The currently selected country will also be on top automatically.
 
 ## Example
 
-In the `example/` directory you will find a very minimal Phoenix application to demonstrate `LivePhone` in usage.
+In the `example/` directory you will find a minimal Phoenix application to demonstrate `LivePhone` in usage.
 
 ## Browser Tests (chromedriver)
+
 To run the browser tests you need to install `chromedriver` (`brew install chromedriver` on MacOS) and it has to be running already. The tests are excluded by default, but you can include them with `--include browser`. See below:
 
 An "invalid session id" error can usually be fixed by upgrading chromedriver.

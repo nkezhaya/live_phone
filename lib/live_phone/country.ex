@@ -47,7 +47,7 @@ defmodule LivePhone.Country do
   def from_iso({country_code, %{"name" => name}}) do
     %__MODULE__{
       region_code: find_region_code(country_code),
-      flag_emoji: LivePhone.emoji_for_country(country_code),
+      flag_emoji: LivePhone.Util.emoji_for_country(country_code),
       code: country_code,
       name: name
     }
