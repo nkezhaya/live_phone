@@ -5,7 +5,7 @@
 
 A Phoenix LiveComponent for phone number input fields, inspired by [`intl-tel-input`](https://github.com/jackocnr/intl-tel-input).
 
-Based on [`ISO`](https://github.com/whitepaperclip/iso) and [`ex_phone_number`](https://github.com/socialpaymentsbv/ex_phone_number), which in turn is based on [libphonenumber](https://github.com/google/libphonenumber).
+Based on [`ISO`](https://github.com/nkezhaya/iso) and [`ex_phone_number`](https://github.com/socialpaymentsbv/ex_phone_number), which in turn is based on [libphonenumber](https://github.com/google/libphonenumber).
 
 ## Installation
 
@@ -15,7 +15,7 @@ by adding `live_phone` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:live_phone, "~> 0.6"}
+    {:live_phone, "~> 0.7"}
   ]
 end
 ```

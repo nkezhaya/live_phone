@@ -1,12 +1,12 @@
 defmodule LivePhone.MixProject do
   use Mix.Project
 
-  @source_url "https://github.com/whitepaperclip/live_phone"
+  @source_url "https://github.com/nkezhaya/live_phone"
 
   def project do
     [
       app: :live_phone,
-      version: "0.6.0",
+      version: "0.7.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -19,8 +19,8 @@ defmodule LivePhone.MixProject do
 
   defp description do
     """
-    LivePhone is a Phoenix LiveView component for phone number input fields,
-    with international support.
+    LivePhone is a Phoenix LiveComponent for phone number input fields, with
+    international support.
     """
   end
 
