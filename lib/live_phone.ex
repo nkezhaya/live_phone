@@ -46,8 +46,18 @@ defmodule LivePhone do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class={"live_phone #{if @valid?, do: "live_phone-valid"}"} id={"live_phone-#{@id}"} phx-hook="LivePhone">
-      <.country_selector tabindex={@tabindex} target={@myself} opened?={@opened?} country={@country} wrapper={"live_phone-#{@id}"} />
+    <div
+      class={"live_phone #{if @valid?, do: "live_phone-valid"}"}
+      id={"live_phone-#{@id}"}
+      phx-hook="LivePhone"
+    >
+      <.country_selector
+        tabindex={@tabindex}
+        target={@myself}
+        opened?={@opened?}
+        country={@country}
+        wrapper={"live_phone-#{@id}"}
+      />
 
       <input
         type="tel"
@@ -59,7 +69,7 @@ defmodule LivePhone do
         phx-target={@myself}
         phx-keyup="typing"
         phx-blur="close"
-      >
+      />
 
       <%= hidden_input(
         assigns[:form],
@@ -238,7 +248,15 @@ defmodule LivePhone do
     assigns = assign(assigns, :region_code, region_code)
 
     ~H"""
-    <div class="live_phone-country" tabindex={@tabindex} phx-target={@target} phx-click="toggle" aria-owns={@wrapper} aria-expanded={to_string(@opened?)} role="combobox">
+    <div
+      class="live_phone-country"
+      tabindex={@tabindex}
+      phx-target={@target}
+      phx-click="toggle"
+      aria-owns={@wrapper}
+      aria-expanded={to_string(@opened?)}
+      role="combobox"
+    >
       <span class="live_phone-country-flag"><%= Util.emoji_for_country(@country) %></span>
       <span class="live_phone-country-code"><%= @region_code %></span>
     </div>
@@ -268,8 +286,7 @@ defmodule LivePhone do
         <.country_list_item country={country} current_country={@country} target={@target} />
 
         <%= if country == @last_preferred do %>
-          <li aria-disabled="true" class="live_phone-country-separator" role="separator">
-          </li>
+          <li aria-disabled="true" class="live_phone-country-separator" role="separator"></li>
         <% end %>
       <% end %>
     </ul>
@@ -287,7 +304,14 @@ defmodule LivePhone do
     assigns = assign(assigns, :class, class)
 
     ~H"""
-    <li aria-selected={to_string(@selected?)} class={@class} phx-click="select_country" phx-target={@target} phx-value-country={@country.code} role="option">
+    <li
+      aria-selected={to_string(@selected?)}
+      class={@class}
+      phx-click="select_country"
+      phx-target={@target}
+      phx-value-country={@country.code}
+      role="option"
+    >
       <span class="live_phone-country-item-flag"><%= @country.flag_emoji %></span>
       <span class="live_phone-country-item-name"><%= @country.name %></span>
       <span class="live_phone-country-item-code">+<%= @country.region_code %></span>
