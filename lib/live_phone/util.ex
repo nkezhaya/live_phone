@@ -94,7 +94,7 @@ defmodule LivePhone.Util do
       {:ok, "+16502530000"}
 
   """
-  @spec normalize(String.t(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
+  @spec normalize(String.t(), String.t() | nil) :: {:ok, String.t()} | {:error, String.t()}
   def normalize(phone, country) do
     phone
     |> String.replace(~r/[^+\d]/, "")
