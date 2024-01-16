@@ -5,7 +5,6 @@ defmodule LivePhone do
   """
 
   use Phoenix.LiveComponent
-  import Phoenix.HTML
   import Phoenix.HTML.Form
   use PhoenixHTMLHelpers
 

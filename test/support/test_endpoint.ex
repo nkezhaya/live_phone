@@ -12,8 +12,6 @@ defmodule LivePhoneTestApp do
   end
 
   defmodule Page do
-    import Phoenix.HTML
-    import Phoenix.HTML.Form
     use PhoenixHTMLHelpers
     use Phoenix.LiveView
 
