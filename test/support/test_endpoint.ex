@@ -12,7 +12,9 @@ defmodule LivePhoneTestApp do
   end
 
   defmodule Page do
-    use Phoenix.HTML
+    import Phoenix.HTML
+    import Phoenix.HTML.Form
+    use PhoenixHTMLHelpers
     use Phoenix.LiveView
 
     @impl true

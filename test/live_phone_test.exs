@@ -61,7 +61,9 @@ defmodule LivePhoneTest do
   end
 
   test "support setting form and field from changeset (new)" do
-    use Phoenix.HTML
+    import Phoenix.HTML
+    import Phoenix.HTML.Form
+    use PhoenixHTMLHelpers
 
     changeset = LivePhoneTestApp.User.changeset()
 
@@ -73,7 +75,9 @@ defmodule LivePhoneTest do
   end
 
   test "support setting form and field from changeset (edit)" do
-    use Phoenix.HTML
+    import Phoenix.HTML
+    import Phoenix.HTML.Form
+    use PhoenixHTMLHelpers
 
     changeset =
       LivePhoneTestApp.User.changeset(

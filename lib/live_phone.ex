@@ -5,7 +5,9 @@ defmodule LivePhone do
   """
 
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  import Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   alias Phoenix.LiveView.Socket
   alias LivePhone.{Country, Util}
