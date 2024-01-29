@@ -6,8 +6,8 @@ defmodule LivePhone.MixProject do
   def project do
     [
       app: :live_phone,
-      version: "0.7.0",
-      elixir: "~> 1.12",
+      version: "0.7.1",
+      elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -58,6 +58,7 @@ defmodule LivePhone.MixProject do
     [
       {:phoenix_live_view, ">= 0.0.0"},
       {:phoenix_html, ">= 0.0.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:ex_phone_number, ">= 0.0.0"},
       {:jason, ">= 0.0.0"},
       {:iso, ">= 0.0.0"},

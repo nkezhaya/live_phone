@@ -1,6 +1,7 @@
 defmodule LivePhoneTest do
   use ExUnit.Case
   import Phoenix.{LiveViewTest, ConnTest}
+  alias Phoenix.HTML.FormData
   doctest LivePhone
 
   @endpoint LivePhoneTestApp.Endpoint
@@ -61,19 +62,19 @@ defmodule LivePhoneTest do
   end
 
   test "support setting form and field from changeset (new)" do
-    use Phoenix.HTML
+    use PhoenixHTMLHelpers
 
     changeset = LivePhoneTestApp.User.changeset()
 
-    form = form_for(changeset, "/")
-    component = render_live_phone(id: "livephone", form: form, field: :phone)
+    component =
+      render_live_phone(id: "livephone", form: FormData.to_form(changeset, []), field: :phone)
 
     assert component =~ "name=\"user[phone]\""
     assert component =~ "value=\"\""
   end
 
   test "support setting form and field from changeset (edit)" do
-    use Phoenix.HTML
+    use PhoenixHTMLHelpers
 
     changeset =
       LivePhoneTestApp.User.changeset(
@@ -81,8 +82,12 @@ defmodule LivePhoneTest do
         %{id: 1, phone: "+16502530000"}
       )
 
-    form = form_for(changeset, "/")
-    component = render_live_phone(id: "livephone", form: form, field: :phone)
+    component =
+      render_live_phone(
+        id: "livephone",
+        form: FormData.to_form(changeset, []),
+        field: :phone
+      )
 
     assert component =~ "name=\"user[phone]\""
     assert component =~ "value=\"+16502530000\""
