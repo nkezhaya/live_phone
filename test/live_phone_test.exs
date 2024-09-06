@@ -58,7 +58,7 @@ defmodule LivePhoneTest do
       )
 
     assert component =~
-             "masks=\"X XX XX XX,XX XXX XX XX,XXX XX XX XXX,XX XX XX XX,XXX XX XXX XX XX\""
+             "masks=\"X XX XX XX,XX XX XX XX,XX XXX XX XX,XXX XX XX XXX,XXX XX XXX XX XX\""
   end
 
   test "support setting form and field from changeset (new)" do
