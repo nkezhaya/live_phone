@@ -14,7 +14,7 @@ if Mix.env() == :test do
     server: true
 
   # Print only warnings and errors during test
-  config :logger, level: :warn
+  config :logger, level: :warning
 
   config :hound,
     driver: "chrome_driver",
