@@ -15,7 +15,7 @@ jobs:
       MIX_ENV: test
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: nanasess/setup-chromedriver@v1
     - run: |
         export DISPLAY=:99
@@ -23,10 +23,10 @@ jobs:
         sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
 
     - name: Set up Elixir
-      uses: erlef/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.14.0' # Define the elixir version [required]
-        otp-version: '25.0' # Define the OTP version [required]
+        elixir-version: '1.17.2' # Define the elixir version [required]
+        otp-version: '27.0' # Define the OTP version [required]
 
     - name: Restore dependencies cache
       uses: actions/cache@v2
