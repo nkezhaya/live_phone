@@ -5,18 +5,17 @@ defmodule LivePhoneExample.Application do
 
   use Application
 
+  @impl true
   def start(_type, _args) do
     children = [
-      # Start the Telemetry supervisor
       LivePhoneExampleWeb.Telemetry,
-      # Start the phone storage agent
       LivePhoneExample.PhoneStorage,
-      # Start the PubSub system
+      {DNSCluster, query: Application.get_env(:live_phone_example, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LivePhoneExample.PubSub},
-      # Start the Endpoint (http/https)
-      LivePhoneExampleWeb.Endpoint
       # Start a worker by calling: LivePhoneExample.Worker.start_link(arg)
-      # {LivePhoneExample.Worker, arg}
+      # {LivePhoneExample.Worker, arg},
+      # Start to serve requests, typically the last entry
+      LivePhoneExampleWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -27,6 +26,7 @@ defmodule LivePhoneExample.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
+  @impl true
   def config_change(changed, _new, removed) do
     LivePhoneExampleWeb.Endpoint.config_change(changed, removed)
     :ok

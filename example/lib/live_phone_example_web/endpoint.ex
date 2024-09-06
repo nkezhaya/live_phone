@@ -7,14 +7,13 @@ defmodule LivePhoneExampleWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_live_phone_example_key",
-    signing_salt: "j40E7Uma"
+    signing_salt: "aK49qyWp",
+    same_site: "Lax"
   ]
 
-  socket "/socket", LivePhoneExampleWeb.UserSocket,
-    websocket: true,
-    longpoll: false
-
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -24,7 +23,7 @@ defmodule LivePhoneExampleWeb.Endpoint do
     at: "/",
     from: :live_phone_example,
     gzip: false,
-    only: ~w(assets css fonts images js favicon.ico robots.txt)
+    only: LivePhoneExampleWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -32,6 +31,7 @@ defmodule LivePhoneExampleWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :live_phone_example
   end
 
   plug Plug.RequestId
