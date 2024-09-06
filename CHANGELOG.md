@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8
+
+  * Compatibility with Phoenix 1.7
+
 ## 0.7
 
   * Major refactor, updated component markup to HEEx
