@@ -15,7 +15,7 @@ by adding `live_phone` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:live_phone, "~> 0.8"}
+    {:live_phone, "~> 0.9"}
   ]
 end
 ```

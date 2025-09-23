@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9
+
+  * Added `:input_class` option
+
 ## 0.8
 
   * Compatibility with Phoenix 1.7
