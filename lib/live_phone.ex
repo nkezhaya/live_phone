@@ -21,6 +21,7 @@ defmodule LivePhone do
      |> assign_new(:value, fn -> "" end)
      |> assign_new(:opened?, fn -> false end)
      |> assign_new(:valid?, fn -> false end)}
+     |> assign_new(:input_class, fn -> "live_phone-input" end)
   end
 
   @impl true
@@ -62,7 +63,7 @@ defmodule LivePhone do
 
       <input
         type="tel"
-        class="live_phone-input"
+        class={assigns[:input_class]}
         value={assigns[:value]}
         tabindex={assigns[:tabindex]}
         placeholder={assigns[:placeholder] || get_placeholder(assigns[:country])}
