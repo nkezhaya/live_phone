@@ -61,7 +61,7 @@ defmodule LivePhone do
 
       <input
         type="tel"
-        class={assigns[:class] || "live_phone-input"}
+        class={assigns[:input_class] || "live_phone-input"}
         value={assigns[:value]}
         tabindex={assigns[:tabindex]}
         placeholder={assigns[:placeholder] || get_placeholder(assigns[:country])}
