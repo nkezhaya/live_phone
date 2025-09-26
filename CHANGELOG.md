@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10
+
+  * Fixed a crash on load
+
 ## 0.9
 
   * Added `:input_class` option
