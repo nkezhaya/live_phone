@@ -5,7 +5,7 @@ defmodule LivePhone.BrowserTest do
   @moduletag :browser
   @endpoint "http://localhost:4002/"
 
-  hound_session()
+  hound_session(additional_capabilities: %{browserName: "chrome"})
 
   describe "country list" do
     test "renders component with country list closed" do

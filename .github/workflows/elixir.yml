@@ -2,7 +2,7 @@ name: Elixir CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
     types: [ opened, reopened, ready_for_review ]
 
@@ -15,11 +15,11 @@ jobs:
       MIX_ENV: test
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: nanasess/setup-chromedriver@v1
+    - uses: actions/checkout@v5
+    - uses: nanasess/setup-chromedriver@v2
     - run: |
         export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
+        chromedriver --url-base=/wd/hub --port=9515 &
         sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
 
     - name: Set up Elixir
@@ -29,7 +29,7 @@ jobs:
         otp-version: '27.0' # Define the OTP version [required]
 
     - name: Restore dependencies cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: deps
         key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}

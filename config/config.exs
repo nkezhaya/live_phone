@@ -2,7 +2,7 @@ import Config
 
 config :phoenix, :json_library, Jason
 
-if Mix.env() == :test do
+if config_env() == :test do
   # We don't run a server during test. If one is required,
   # you can enable the server option below.
   config :live_phone, LivePhoneTestApp.Endpoint,
