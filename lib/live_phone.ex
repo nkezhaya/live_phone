@@ -20,8 +20,8 @@ defmodule LivePhone do
      |> assign_new(:apply_format?, fn -> false end)
      |> assign_new(:value, fn -> "" end)
      |> assign_new(:opened?, fn -> false end)
-     |> assign_new(:valid?, fn -> false end)}
-     |> assign_new(:input_class, fn -> "live_phone-input" end)
+     |> assign_new(:valid?, fn -> false end)
+     |> assign_new(:input_class, fn -> "live_phone-input" end)}
   end
 
   @impl true
