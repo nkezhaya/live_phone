@@ -72,7 +72,7 @@ defmodule LivePhone.MixProject do
 
       # Browser tests
       {:plug_cowboy, "~> 2.0", only: :test},
-      {:hound, "~> 1.0", only: :test}
+      {:wallaby, "~> 0.30", runtime: false, only: :test}
     ]
   end
 

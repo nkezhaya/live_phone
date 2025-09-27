@@ -63,13 +63,8 @@ With `preferred` you can set a list of countries that you believe should be on t
 
 In the `example/` directory you will find a minimal Phoenix application to demonstrate `LivePhone` in usage.
 
-## Browser Tests (chromedriver)
+## Browser Tests (Wallaby)
 
-To run the browser tests you need to install `chromedriver` (`brew install chromedriver` on MacOS) and it has to be running already. The tests are excluded by default, but you can include them with `--include browser`. See below:
+To run the browser tests you need to install `chromedriver` (`brew install chromedriver` on macOS) so Wallaby can launch headless Chrome. The tests are excluded by default; include them with `--include browser` when running `mix test`.
 
 An "invalid session id" error can usually be fixed by upgrading chromedriver.
-
-```
-$ chromedriver --verbose --url-base=/wd/hub # hound assumes default port 9515)
-$ mix test --include browser
-```

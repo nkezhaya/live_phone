@@ -5,8 +5,8 @@ System.cmd(Path.join(File.cwd!(), "copy-static.sh"), [], cd: File.cwd!())
 # start test endpoint
 LivePhoneTestApp.Application.start()
 
-# start hound for frontend testing
-Application.ensure_all_started(:hound)
+# start wallaby for browser testing
+{:ok, _} = Application.ensure_all_started(:wallaby)
 
 # start tests but exclude skip and browser by default
 ExUnit.start(exclude: [:skip, :browser])

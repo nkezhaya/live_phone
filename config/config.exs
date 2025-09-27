@@ -16,10 +16,9 @@ if config_env() == :test do
   # Print only warnings and errors during test
   config :logger, level: :warning
 
-  config :hound,
-    driver: "chrome_driver",
-    browser: "chrome_headless",
-    app_port: 4002,
-    host: "http://127.0.0.1",
-    path_prefix: "wd/hub/"
+  config :wallaby,
+    otp_app: :live_phone,
+    driver: Wallaby.Chrome,
+    base_url: "http://localhost:4002",
+    chromedriver: [headless: true]
 end
