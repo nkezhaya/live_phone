@@ -113,7 +113,11 @@ class LivePhone {
 
     // Find all typed digits
     let digits = digitsOnly(this.elements.textField().value)
-    if (!digits.length) return
+    if (!digits.length) {
+      this.elements.textField().value = ''
+      this.elements.hiddenField().value = ''
+      return
+    }
 
     // Find the best-match mask based on digit and mask lengths
     let [currentMask] = this.masks
