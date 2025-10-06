@@ -129,7 +129,12 @@ class LivePhone {
         if (sizeA > sizeB) return 1
         return 0
       })
-    if (!currentMask) return
+    if (!currentMask) {
+      let digitsString = digits.join('')
+      this.elements.textField().value = digitsString
+      this.elements.hiddenField().value = digitsString
+      return
+    }
 
     // Replace the mask letters with digits
     let value = currentMask.replace(/[X]/g, match => {
