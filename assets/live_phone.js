@@ -113,7 +113,11 @@ class LivePhone {
 
     // Find all typed digits
     let digits = digitsOnly(this.elements.textField().value)
-    if (!digits.length) return
+    if (!digits.length) {
+      this.elements.textField().value = ''
+      this.elements.hiddenField().value = ''
+      return
+    }
 
     // Find the best-match mask based on digit and mask lengths
     let [currentMask] = this.masks
@@ -125,7 +129,12 @@ class LivePhone {
         if (sizeA > sizeB) return 1
         return 0
       })
-    if (!currentMask) return
+    if (!currentMask) {
+      let digitsString = digits.join('')
+      this.elements.textField().value = digitsString
+      this.elements.hiddenField().value = digitsString
+      return
+    }
 
     // Replace the mask letters with digits
     let value = currentMask.replace(/[X]/g, match => {
