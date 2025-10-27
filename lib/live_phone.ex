@@ -70,6 +70,7 @@ defmodule LivePhone do
         data-masks={@masks}
         phx-target={@myself}
         phx-keyup="typing"
+        phx-debounce={assigns[:phx_debounce]}
         phx-blur="close"
       />
 
