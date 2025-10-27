@@ -52,12 +52,15 @@ Usage is pretty simple, and there is an example Phoenix project included in the 
   form={:user}
   field={:phone}
   tabindex={0}
-  preferred={["US", "CA"]} />
+  preferred={["US", "CA"]}
+  phx_debounce="100" />
 ```
 
 This will result in a form field with the name `user[phone]`. You can specify just the `name` manually if desired, but when you add the `form` option the name will be generated via `Phoenix.HTML.Form.input_name/2`. So this should behave like a regular input field.
 
 With `preferred` you can set a list of countries that you believe should be on top always. The currently selected country will also be on top automatically.
+
+With `phx_debounce`, you can rate limit events affecting the input field, so that you won't send events to your backend everytime the user presses a key stroke. Please refer [https://hexdocs.pm/phoenix_live_view/bindings.html#rate-limiting-events-with-debounce-and-throttle](to your version of LiveView bindings for more information).
 
 ## Example
 
