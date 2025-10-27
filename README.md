@@ -60,7 +60,7 @@ This will result in a form field with the name `user[phone]`. You can specify ju
 
 With `preferred` you can set a list of countries that you believe should be on top always. The currently selected country will also be on top automatically.
 
-With `phx_debounce`, you can rate limit events affecting the input field, so that you won't send events to your backend everytime the user presses a key stroke. Please refer [https://hexdocs.pm/phoenix_live_view/bindings.html#rate-limiting-events-with-debounce-and-throttle](to your version of LiveView bindings for more information).
+With `phx_debounce`, you can rate limit events affecting the input field, so that you won't send events to your backend everytime the user presses a key stroke. Please refer [https://hexdocs.pm/phoenix_live_view/bindings.html#rate-limiting-events-with-debounce-and-throttle](to your version of LiveView bindings for more information). Sending too many events to your backend may make your UI erratic and slow to respond to users with a lot of latency.
 
 ## Example
 
