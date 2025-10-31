@@ -40,11 +40,11 @@ defmodule LivePhoneTest do
   test "has no phx-debounce by default" do
     component = render_live_phone(id: "livephone")
 
-    assert component =~ "phx-debounce=\"\""
+    refute component =~ "phx-debounce"
   end
 
   test "support setting phx-debounce" do
-    component = render_live_phone(id: "livephone", phx_debounce: "blur")
+    component = render_live_phone(id: "livephone", "phx-debounce": "blur")
 
     assert component =~ "phx-debounce=\"blur\""
   end
