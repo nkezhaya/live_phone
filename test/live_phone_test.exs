@@ -37,6 +37,18 @@ defmodule LivePhoneTest do
     assert component =~ "placeholder=\"Phone Number\""
   end
 
+  test "has no phx-debounce by default" do
+    component = render_live_phone(id: "livephone")
+
+    refute component =~ "phx-debounce"
+  end
+
+  test "support setting phx-debounce" do
+    component = render_live_phone(id: "livephone", "phx-debounce": "blur")
+
+    assert component =~ "phx-debounce=\"blur\""
+  end
+
   test "support setting mask (single)" do
     component =
       render_live_phone(
