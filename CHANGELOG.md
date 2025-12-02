@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11
+
+  * Added `phx-debounce` support (Credit: [@mbuffa](https://github.com/mbuffa))
+
 ## 0.10
 
   * Fixed a crash on load
