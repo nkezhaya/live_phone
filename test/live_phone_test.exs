@@ -43,6 +43,18 @@ defmodule LivePhoneTest do
     refute component =~ "phx-debounce"
   end
 
+  test "has strict mode disabled by default" do
+    component = render_live_phone(id: "livephone")
+
+    assert component =~ "data-strict=\"false\""
+  end
+
+  test "supports strict mode" do
+    component = render_live_phone(id: "livephone", strict: true)
+
+    assert component =~ "data-strict=\"true\""
+  end
+
   test "support setting phx-debounce" do
     component = render_live_phone(id: "livephone", "phx-debounce": "blur")
 

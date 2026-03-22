@@ -13,6 +13,16 @@ const maskSize = input =>
   .split('') // turn into array
   .length // return length
 
+const strictValue = input => {
+  if (!input) return ''
+
+  let value = input.replace(/[^0-9+]/g, '')
+  let hasLeadingPlus = value[0] === '+'
+  value = value.replace(/\+/g, '')
+
+  return hasLeadingPlus ? `+${value}` : value
+}
+
 class LivePhone {
   constructor(context) {
     // This contains the original context of the LiveView Hook
@@ -44,6 +54,8 @@ class LivePhone {
     } else {
       this.masks = []
     }
+
+    this.strict = this.elements.textField().dataset.strict === 'true'
     this.format()
   }
 
@@ -109,15 +121,23 @@ class LivePhone {
 
   // Format the visible input field using the best-match mask
   format() {
-    if (!this.masks) return
+    const textField = this.elements.textField()
+    const hiddenField = this.elements.hiddenField()
+    if (!textField) return
+
+    if (this.strict) {
+      textField.value = strictValue(textField.value)
+    }
 
     // Find all typed digits
-    let digits = digitsOnly(this.elements.textField().value)
+    let digits = digitsOnly(textField.value)
     if (!digits.length) {
-      this.elements.textField().value = ''
-      this.elements.hiddenField().value = ''
+      textField.value = this.strict && textField.value[0] === '+' ? '+' : ''
+      if (hiddenField) hiddenField.value = ''
       return
     }
+
+    if (this.strict || !this.masks || !this.masks.length) return
 
     // Find the best-match mask based on digit and mask lengths
     let [currentMask] = this.masks
@@ -129,7 +149,12 @@ class LivePhone {
         if (sizeA > sizeB) return 1
         return 0
       })
-    if (!currentMask) return
+    if (!currentMask) {
+      if (this.strict) {
+        textField.value = strictValue(textField.value)
+      }
+      return
+    }
 
     // Replace the mask letters with digits
     let value = currentMask.replace(/[X]/g, match => {
@@ -145,7 +170,7 @@ class LivePhone {
       value = value.substr(0, lastDigitIndex + 1)
     }
 
-    this.elements.textField().value = value
+    textField.value = value
   }
 
   // While the user typing in the input field we want to auto format it
@@ -155,12 +180,20 @@ class LivePhone {
 
   // When the LiveView component gets updated it will execute this callback
   onUpdate() {
+    const textField = this.elements.textField()
+    if (!textField) return
+
+    this.strict = textField.dataset.strict === 'true'
+
     // Update the masks (if there were previous masks set)
-    let newMasks = this.elements.textField().dataset.masks
-    if (this.masks && newMasks) {
+    let newMasks = textField.dataset.masks
+    if (newMasks) {
       this.masks = newMasks.split(/\s*,\s*/g)
-      this.format()
+    } else {
+      this.masks = []
     }
+
+    this.format()
   }
 
   // Move the currently selected country in the country list overlay
