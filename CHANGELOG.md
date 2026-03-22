@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12
+
+  * Cleared hidden input when the field is emptied (reported by [@stephenk98](https://github.com/stephenk98) and [@nolman](https://github.com/nolman))
+  * Added `strict` mode
+
 ## 0.11
 
   * Added `phx-debounce` support (Credit: [@mbuffa](https://github.com/mbuffa))
