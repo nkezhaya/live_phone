@@ -55,7 +55,7 @@ class LivePhone {
       this.masks = []
     }
 
-    this.strict = this.elements.textField().dataset.strict === 'true'
+    this.strict = this.elements.textField().hasAttribute('data-strict')
     this.format()
   }
 
@@ -183,7 +183,7 @@ class LivePhone {
     const textField = this.elements.textField()
     if (!textField) return
 
-    this.strict = textField.dataset.strict === 'true'
+    this.strict = textField.hasAttribute('data-strict')
 
     // Update the masks (if there were previous masks set)
     let newMasks = textField.dataset.masks
