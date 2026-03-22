@@ -17,7 +17,10 @@ defmodule LivePhoneTestApp do
 
     @impl true
     def handle_params(params, _session, socket) do
-      {:noreply, socket |> assign(format?: params["format"] == "1")}
+      {:noreply,
+       socket
+       |> assign(format?: params["format"] == "1")
+       |> assign(strict?: params["strict"] == "1")}
     end
 
     @impl true
@@ -32,6 +35,7 @@ defmodule LivePhoneTestApp do
           form={:user}
           field={:phone}
           apply_format?={assigns[:format?]}
+          strict={assigns[:strict?]}
           placeholder="Phone"
           preferred={["US", "GB", "CA"]}
           test_counter={assigns[:test_counter]}

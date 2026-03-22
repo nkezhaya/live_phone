@@ -100,5 +100,47 @@ defmodule LivePhone.BrowserTest do
 
       assert value == "650-253-0000"
     end
+
+    feature "strict mode strips non-digit characters", %{session: session} do
+      session =
+        session
+        |> visit(@root_path <> "?strict=1")
+        |> fill_in(Query.css("input.live_phone-input"), with: "212-312-3321ddd")
+
+      value =
+        session
+        |> find(Query.css("input.live_phone-input"))
+        |> Element.attr("value")
+
+      assert value == "2123123321"
+    end
+
+    feature "strict mode allows a leading plus", %{session: session} do
+      session =
+        session
+        |> visit(@root_path <> "?strict=1")
+        |> fill_in(Query.css("input.live_phone-input"), with: "+1 (650) 253-0000")
+
+      value =
+        session
+        |> find(Query.css("input.live_phone-input"))
+        |> Element.attr("value")
+
+      assert value == "+16502530000"
+    end
+
+    feature "strict mode skips visible masking", %{session: session} do
+      session =
+        session
+        |> visit(@root_path <> "?strict=1&format=1")
+        |> fill_in(Query.css("input.live_phone-input"), with: "6502530000")
+
+      value =
+        session
+        |> find(Query.css("input.live_phone-input"))
+        |> Element.attr("value")
+
+      assert value == "6502530000"
+    end
   end
 end

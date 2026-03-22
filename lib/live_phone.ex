@@ -18,6 +18,7 @@ defmodule LivePhone do
      |> assign_new(:preferred, fn -> ["US", "GB"] end)
      |> assign_new(:tabindex, fn -> 0 end)
      |> assign_new(:apply_format?, fn -> false end)
+     |> assign_new(:strict, fn -> false end)
      |> assign_new(:value, fn -> "" end)
      |> assign_new(:opened?, fn -> false end)
      |> assign_new(:valid?, fn -> false end)
@@ -68,6 +69,7 @@ defmodule LivePhone do
         tabindex={assigns[:tabindex]}
         placeholder={assigns[:placeholder] || get_placeholder(assigns[:country])}
         data-masks={@masks}
+        data-strict={@strict}
         phx-target={@myself}
         phx-keyup="typing"
         phx-debounce={assigns[:"phx-debounce"]}
