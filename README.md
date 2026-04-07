@@ -63,7 +63,7 @@ With `preferred` you can set a list of countries that you believe should be on t
 
 With `strict` enabled, the visible input only allows digits and an optional leading `+`. When strict mode is on, visible masking is skipped so the field stays strictly numeric-ish. This keeps the displayed value closer to the normalized value that gets submitted, while preserving the existing permissive behavior by default.
 
-With `phx-debounce`, you can rate limit events affecting the input field, so that you won't send events to your backend everytime the user presses a key stroke. Please refer [https://hexdocs.pm/phoenix_live_view/bindings.html#rate-limiting-events-with-debounce-and-throttle](to your version of LiveView bindings for more information). Sending too many events to your backend may make your UI erratic and slow to respond to users with a lot of latency.
+With `phx-debounce`, you can rate limit events affecting the input field, so that you won't send events to your backend everytime the user presses a key stroke. Please refer [to your version of LiveView bindings for more information](https://hexdocs.pm/phoenix_live_view/bindings.html#rate-limiting-events-with-debounce-and-throttle). Sending too many events to your backend may make your UI erratic and slow to respond to users with a lot of latency.
 
 ## Example
 
